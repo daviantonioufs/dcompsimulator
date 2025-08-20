@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Bloco Funcional</title>
+<title>Minigame</title>
 <style>
   body {
     margin: 0;
@@ -10,7 +10,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #111
+    background: #111;
   }
 
   .arena {
@@ -20,15 +20,29 @@
     background: #222;
     border: 3px solid #555;
     border-radius: 12px;
-    overflow: hidden
+    overflow: hidden;
   }
 
   .bloco {
     position: absolute;
     width: 50px;
     height: 50px;
-    background: #4ade80;
-    border-radius: 8px
+    background: #09461f;
+    border-radius: 8px;
+  }
+   .broche {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: #42b66d;
+    border-radius: 8px;
+    }
+    .gameover {
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    background: #ffd700;
+    border-radius: 8px;
   }
 </style>
 </head>
@@ -38,42 +52,77 @@
 <script>
 const arena = document.getElementById("arena")
 
+// Funções de criação de Entidades
 const criarBloco = (pos) => {
-  const b = document.createElement("div")
-  b.className = "bloco"
-  b.style.left = pos.x + "px"
-  b.style.top  = pos.y + "px"
-  arena.appendChild(b)
-  return b
+    const b = document.createElement("div")
+    b.className = "bloco"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+    
+};
+const criarGameOver = (pos) => {
+    const b = document.createElement("div")
+    b.className = "gameover"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
 }
+const criarBroche = (pos) => {
+    const b = document.createElement("div")
+    b.className = "broche"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+};
 
-const EstadoInicial = { x: 125, y: 225 }
+const EstadoInicial = { x: 100, y: 120 }
+const BrocheInicial = {x: 100, y: 200}
+const gameoverInicial = {x: 0 , y: 0}
 const bloco = criarBloco(EstadoInicial)
-
+const broche = criarBroche(BrocheInicial)
 const mover = (estado, tecla) => {
-  const passo = 40
-  const novo = {
-    x: tecla === 'ArrowRight' ? estado.x + passo : tecla === 'ArrowLeft'  ? estado.x - passo : estado.x,
-    y: tecla === 'ArrowUp'    ? estado.y - passo : tecla === 'ArrowDown' ? estado.y + passo : estado.y
-  }
-  return novo
+    const passo = 10
+    const maxX = arena.clientWidth - 50
+    const maxY = arena.clientHeight - 50
+    const novo = {
+        x: tecla === 'ArrowRight' ? estado.x + passo : tecla === 'ArrowLeft'  ? estado.x - passo : estado.x,
+        y: tecla === 'ArrowUp'    ? estado.y - passo : tecla === 'ArrowDown' ? estado.y + passo : estado.y
+    }
+    return {
+      x: Math.min(Math.max(novo.x, 0), maxX),
+      y: Math.min(Math.max(novo.y, 0), maxY)
+    }
 }
+// função de movimentação que altera as coordenadas da entidade bloco
 
 const loop = (estado) => {
-  document.addEventListener('keydown', (e) => {
-    const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft']
-    if (teclas.includes(e.key)) {
-      const novo = mover(estado, e.key)
-      bloco.style.left = novo.x + "px"
-      bloco.style.top  = novo.y + "px"
-      loop(novo)
-    } else {
-      loop(estado)
-    }
-  }, { once: true })
-}
 
+    document.addEventListener('keydown', (e) => {
+        const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft']
+        if (teclas.includes(e.key)) {
+            const novo = mover(estado, e.key);
+            if((novo.x - BrocheInicial.x) < 15 && (novo.x - BrocheInicial.x) > -15 && (novo.y - BrocheInicial.y) > -5 && (novo.y - BrocheInicial.y) < 5 ){    
+                const GameOverdeCria = criarGameOver(gameoverInicial)
+            }
+            else{
+                bloco.style.left = novo.x + "px"
+                bloco.style.top  = novo.y + "px"
+                loop(novo)
+            }
+        }
+        else{
+            loop(estado)
+        }
+
+    },{once: true})
+}
+  // função que utiliza recursividade para mudar a posição do personagem, sendo utilizado o once here do addEventListener para que ele só rode uma vez a cada chamado
 loop(EstadoInicial)
 </script>
 </body>
 </html>
+
