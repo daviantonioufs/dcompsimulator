@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Bloco Funcional</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #111;
+  }
+
+  .arena {
+    position: relative;
+    width: 1300px;
+    height: 600px;
+    background: #222;
+    border: 3px solid #555;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+ .bloco {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: #4ade80;
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+  <div class="arena" id="arena"></div>
+
+<script>
+const arena = document.getElementById("arena");
+const criarBloco = (pos) => {
+    const b = document.createElement("div");
+    b.className = "bloco";
+    b.style.left = pos.x + "px";
+    b.style.top  = pos.y + "px";
+    arena.appendChild(b);
+    return b;
+};
+
+const EstadoInicial = { x: 125, y: 225 };
+let EstadoAtual = EstadoInicial;
+
+const bloco = criarBloco(EstadoInicial);
+
+const mover = (estado, tecla) => {
+    const passo = 10;
+    const novo = {
+        x: tecla === 'ArrowRight' ? estado.x + passo :
+           tecla === 'ArrowLeft'  ? estado.x - passo : estado.x,
+        y: tecla === 'ArrowUp'    ? estado.y - passo :  // inverter
+           tecla === 'ArrowDown' ? estado.y + passo : estado.y
+    };
+    return novo;
+};
+
+
+document.addEventListener('keydown', (e) => {
+    const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft'];
+    if (teclas.includes(e.key)) {
+        EstadoAtual = mover(EstadoAtual, e.key);
+        bloco.style.left = EstadoAtual.x + "px";
+        bloco.style.top  = EstadoAtual.y + "px";
+    }
+});
+</script>
+</body>
+</html>
