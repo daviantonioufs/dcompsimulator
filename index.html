@@ -6,7 +6,7 @@
     <title>DCOMP SIMULATOR</title>
     
     <style>
-    /*A base da maioria dos estilos tiramos do site do Amor Doce, onde nos adaptamos em alguns momentos usando
+    /*A base da maioria dos estilos tiramos do site do Amor Doce, onde nós adaptamos em alguns momentos usando
     o inspecionar pra regular a posição de certos elementos*/
    body {
     margin: 0;
@@ -106,8 +106,10 @@
     </style>
 </head>
 <body>
-    <!--Em breve terá uma música para o site!-->
-    <!--Aqui definimos os principais divs para compor o ambiente da visual novel-->
+    <audio preload="auto" autoplay loop>
+        <source src="assets/jazz-lounge-elevator-music-332339.mp3" type="audio/mpeg">
+        <!--Música adicionada com sucesso!-->
+    </audio>
     <div class="novel">
         <div class="faladopersonagem"></div>
         <div class="cenario"></div>
@@ -121,20 +123,24 @@
 </body>
 <script>
 
-//Aqui temos a lista com o objeto que representam os personagens, contendo o id deles e o url do avatar que será exibido  
+//Aqui temos a lista com o objeto que representam os personagens, contendo o id deles e o url do avatar que será exibido 
+//Implementamos mais dois personagens: Good Ways e Kal-el Freira! 
 const personagens = {
-   pinguitor: {nome: 'Pinguitor', avatar: 'assets/pinguitor.png'}
+   pinguitor: {nome: 'Pinguitor', avatar: 'assets/pinguitor.png'},
+   goodways: {nome: 'Good Ways', avatar: 'assets/goodways.png'},
+   kalelfreira: {nome: 'Kal-El Freira', avatar:'assets/kal-elfeliz.png'}
 }
 
 //Aqui criamos outra lista que contém as cenas. Elas detalham o personagem pelo id da lista anterior (puxa o avatar e o nome do personagem)
 //Além disso ele determina o cenário da cena, o diálogo a ser exibido e um array com as diferentes opções.
+//Colocamos novos cenários!
 const cenas = {
   inicio: {
     personagem: 'pinguitor',
     cenario: 'assets/fundo_ufs.jpg',
     dialogo: 'Olá, seja bem-vindo ao DCOMP! Eu sou o Pinguitor, arauto da atlética Bugados e serei seu guia',
     opcoes: [
-      {opcao: 1, texto: 'Vamos lá!' , proximaCena: 'escolhaderotas'}
+      {opcao: 1, texto: 'A. Vamos lá!' , proximaCena: 'escolhaderotas'}
     ]
   },
 
@@ -143,9 +149,27 @@ const cenas = {
     cenario: 'assets/fundo_ufs.jpg',
     dialogo: 'Escolha uma das rotas para conhecer mais sobre as aventuras do curso:',
     opcoes: [
-      {opcao: 1, texto: 'A. Rota do Peregrino (em construção)' , proximaCena: 'olagoodways'},
-      {opcao: 2, texto: 'B. Rota das Arauto das Normas (em construção)' , proximaCena: 'olakalelfreira'},
+      {opcao: 1, texto: 'A. Rota do Peregrino' , proximaCena: 'apresentacaogoodways'},
+      {opcao: 2, texto: 'B. Rota do Arauto das Normas' , proximaCena: 'olakalelfreira'}, //tinhamos cometido um erro no nome da rota
       {opcao: 3, texto: 'C. Rota do Broche (em construção)' , proximaCena: 'uminimigoteespera'}
+    ]
+  },
+
+  apresentacaogoodways: {
+    personagem: 'goodways',
+    cenario: 'assets/ufs_resun.jpg',
+    dialogo: 'Perdoe-me! Meu nome é Good Ways e sou professor do DCOMP, além de secretário regional da SBC!',
+    opcoes: [
+      {opcao: 1, texto: 'A. Prazer! Mas o que é SBC?' , proximaCena: 'explicacaosbc'}
+    ]
+  },
+
+   olakalelfreira: {
+    personagem: 'kalelfreira',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Olá, dcomper! Me chamo Kal-el Freira e lhe ensinarei sobre o conjunto de normas que rege esta Cidade Universitária!',
+    opcoes: [
+      {opcao: 1, texto: 'A. É tipo etiqueta?' , proximaCena: 'aufseumaselva'}
     ]
   }
 }
@@ -179,7 +203,7 @@ const renderizarCena = (cenaId) => {
 }
 
 //Aqui definimos qual a primeira cena que aparecerá quando a função for chamada, que no caso é a home do jogo
-//A ideia é aprimorar mais o jogo
+//A ideia é aprimorar mais o jogo...
 renderizarCena('inicio')
 
 </script>
