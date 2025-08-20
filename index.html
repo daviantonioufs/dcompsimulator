@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCOMP SIMULATOR</title>
+    
+    <style>
+    /*A base da maioria dos estilos tiramos do site do Amor Doce, onde nos adaptamos em alguns momentos usando
+    o inspecionar pra regular a posição de certos elementos*/
+   body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    background-image: url("assets/cidadefundosite.jpg");
+    background-size: cover;
+    backdrop-filter: blur(5px);
+  }
+
+    .novel{
+        display: block;
+        box-shadow: 0 0 5px .1px #181818ba;
+        width: 878px;
+        margin: auto;
+        background-color: rgba(255, 255, 255);
+        position: relative;
+        min-height: 560px;
+}
+
+.cenario{
+        width: 878px;
+        margin: auto;
+        background-color: rgba(255, 255, 255);
+        position: absolute;
+        background-size: cover;
+        min-height: 560px
+    }
+
+    .caixadeescolhas{
+        background-color: rgba(255, 255, 255, 0.85);
+        border: 3px solid rgb(91, 20, 222); 
+        box-sizing: border-box;
+        color: rgb(51, 51, 51);
+        line-height: 1.4;
+        padding: 15px 20px;
+        width: 831px;
+        position: absolute;
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 30;
+        display: flex;
+        flex-direction: column; 
+        gap: 10px; 
+        margin-top: auto; 
+    }
+
+    .escolha{
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0);
+        color: rgba(104, 56, 152, 0.85) ;
+        padding: 3px 10px 3px 10px;
+        line-height: 24px;
+        font-size: 18px;
+        transition: all 0.3s;
+        font-family: Arvo, serif;
+    }
+
+    .escolha:hover:not([disabled]){
+        background: rgba(104, 56, 152);
+        color: rgba(255, 255, 255);
+    }
+  
+    .personagem {
+        position: absolute;
+        right: -85px;
+        padding: 94px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+}
+
+    .avatar{
+        width: 311px;
+        
+    }
+
+    .faladopersonagem{
+        background-color: #ffffffd9;
+        border-radius: 25px;
+        border: 3px solid white;
+        box-sizing: content-box;
+        font-size: 17px;
+        font-weight: normal;
+        line-height: 30px;
+        padding: 13px 16px;
+        position: absolute;
+        text-align: left;
+        z-index: 20;
+        overflow-wrap: break-word;
+        top: 26.5086%;
+        left: 15.7812%;
+        max-width: 23.75%;
+        font-family: Arvo, serif;
+    }
+    </style>
+</head>
+<body>
+    <!--Em breve terá uma música para o site!-->
+    <!--Aqui definimos os principais divs para compor o ambiente da visual novel-->
+    <div class="novel">
+        <div class="faladopersonagem"></div>
+        <div class="cenario"></div>
+        <div class="personagem">
+            <img class="avatar" src="" alt="avatar"><img>
+        </div>
+        <div class="caixadeescolhas">
+            <div class="escolha"></div>
+        </div>
+    </div>
+</body>
+<script>
+
+//Aqui temos a lista com o objeto que representam os personagens, contendo o id deles e o url do avatar que será exibido  
+const personagens = {
+   pinguitor: {nome: 'Pinguitor', avatar: 'assets/pinguitor.png'}
+}
+
+//Aqui criamos outra lista que contém as cenas. Elas detalham o personagem pelo id da lista anterior (puxa o avatar e o nome do personagem)
+//Além disso ele determina o cenário da cena, o diálogo a ser exibido e um array com as diferentes opções.
+const cenas = {
+  inicio: {
+    personagem: 'pinguitor',
+    cenario: 'assets/fundo_ufs.jpg',
+    dialogo: 'Olá, seja bem-vindo ao DCOMP! Eu sou o Pinguitor, arauto da atlética Bugados e serei seu guia',
+    opcoes: [
+      {opcao: 1, texto: 'Vamos lá!' , proximaCena: 'escolhaderotas'}
+    ]
+  },
+
+ escolhaderotas: {
+    personagem: 'pinguitor',
+    cenario: 'assets/fundo_ufs.jpg',
+    dialogo: 'Escolha uma das rotas para conhecer mais sobre as aventuras do curso:',
+    opcoes: [
+      {opcao: 1, texto: 'A. Rota do Peregrino (em construção)' , proximaCena: 'olagoodways'},
+      {opcao: 2, texto: 'B. Rota das Arauto das Normas (em construção)' , proximaCena: 'olakalelfreira'},
+      {opcao: 3, texto: 'C. Rota do Broche (em construção)' , proximaCena: 'uminimigoteespera'}
+    ]
+  }
+}
+//Essa função procura no objeto "cenas" um id correspondente com a cena e retorna os elementos pedidos. 
+//Optamos por usar "cenas" como um objeto ao invés de um array pela praticidade buscar o id
+//sem ter que buscar pela posição, indo diretamente em busca da string do nome da cena.
+const carregarCena = (idCena) => {
+    const cena = cenas[idCena]
+    const personagem = personagens[cena.personagem]
+    return {
+        avatar: personagem.avatar,
+        dialogo: cena.dialogo,
+        cenario: cena.cenario,
+        opcoes: cena.opcoes
+    }
+  }
+
+//Essa função, por sua vez, utiliza os elementos passados por carregarCena através do id da cena 
+//e usa o querySelector para atualizar os elementos no DOM. Usa o reduce pra concatenar 
+//as respostas como botões clicáveis, que envia o id pra passar de cena e exibe o texto da 
+//escolha da cena para o jogador identificar as opções.
+const renderizarCena = (cenaId) => {
+    const base = carregarCena(cenaId)
+
+    document.querySelector(".faladopersonagem").textContent = base.dialogo
+    document.querySelector(".avatar").src = base.avatar
+    document.querySelector(".cenario").style.backgroundImage = `url(${base.cenario})`
+    document.querySelector(".caixadeescolhas").innerHTML = base.opcoes.reduce((html,escolha) => 
+    html + `<div class="escolha" onclick="renderizarCena('${escolha.proximaCena}')">${escolha.texto}</div>`, "")
+    
+}
+
+//Aqui definimos qual a primeira cena que aparecerá quando a função for chamada, que no caso é a home do jogo
+//A ideia é aprimorar mais o jogo
+renderizarCena('inicio')
+
+</script>
+</html>
