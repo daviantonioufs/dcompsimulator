@@ -2,166 +2,219 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Minigame Funcional</title>
+<title>Jogo funcional do Big C</title>
 <style>
   body {
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #111;
+    margin: 0
+    height: 100vh
+    display: flex
+    justify-content: center
+    align-items: center
+    background: #111
+  }
+
+  .obst {
+    position: absolute
+    width: 50px
+    height: 50px
+    background: #250bec
+    border-radius: 8px
   }
 
   .arena {
-    position: relative;
-    width: 500px;
-    height: 300px;
-    background: #222;
-    border: 3px solid #555;
-    border-radius: 12px;
-    overflow: hidden;
+    position: relative
+    width: 800px
+    height: 500px
+    background: #222
+    border: 3px solid #555
+    border-radius: 12px
+    overflow: hidden
   }
 
   .bloco {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background: #09461f;
-    border-radius: 8px;
+    position: absolute
+    width: 50px
+    height: 50px
+    background: #09461f
+    border-radius: 8px
   }
-   .broche {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background: #42b66d;
-    border-radius: 8px;
-    }
-    .gameover {
-    position: absolute;
-    width: 800px;
-    height: 800px;
-    background: #ffd700;
-    border-radius: 8px;
+
+  .broche {
+    position: absolute
+    width: 20px
+    height: 20px
+    background: #f20808
+    border-radius: 99px
   }
+
+  .gameover {
+    position: absolute
+    width: 800px
+    height: 800px
+    background: #ffd700
+    border-radius: 8px
+  }
+
   .inimigo {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background: #153d24;
-    border-radius: 8px;
-    }
+    position: absolute
+    width: 50px
+    height: 50px
+    background: #153d24
+    border-radius: 8px
+  }
 </style>
 </head>
 <body>
   <div class="arena" id="arena"></div>
 
 <script>
+
+//selção de criação de bixos da arena 
+const gerarObs = (pos) => {
+  const o = document.createElement("div")
+  o.className = "obst"
+  o.style.left = pos.x + "px"
+  o.style.top  = pos.y + "px"
+  arena.appendChild(o)
+  return o
+}
+
 const arena = document.getElementById("arena")
 
+/
 const criarBloco = (pos) => {
-    const b = document.createElement("div")
-    b.className = "bloco"
-    b.style.left = pos.x + "px"
-    b.style.top  = pos.y + "px"
-    arena.appendChild(b)
-    return b
-    
-};
-const criarInimigo = (pos) => {
-    const b = document.createElement("div")
-    b.className = "inimigo"
-    b.style.left = pos.x + "px"
-    b.style.top  = pos.y + "px"
-    arena.appendChild(b)
-    return b
-    
-};
-const criarGameOver = (pos) => {
-    const b = document.createElement("div")
-    b.className = "gameover"
-    b.style.left = pos.x + "px"
-    b.style.top  = pos.y + "px"
-    arena.appendChild(b)
-    return b
+  const b = document.createElement("div")
+  b.className = "bloco"
+  b.style.left = pos.x + "px"
+  b.style.top  = pos.y + "px"
+  arena.appendChild(b)
+  return b
 }
-const criarBroche = (pos) => {
-    const b = document.createElement("div")
-    b.className = "broche"
-    b.style.left = pos.x + "px"
-    b.style.top  = pos.y + "px"
-    arena.appendChild(b)
-    return b
-};
 
-const EstadoInicial = { x: 100, y: 120 }
-const InimigoIncial = {x: 125,y: 202}
+const criarInimigo = (pos) => {
+  const b = document.createElement("div")
+  b.className = "inimigo"
+  b.style.left = pos.x + "px"
+  b.style.top  = pos.y + "px"
+  arena.appendChild(b)
+  return b
+}
+
+
+const criarGameOver = (pos) => {
+  const b = document.createElement("div")
+  b.className = "gameover"
+  b.style.left = pos.x + "px"
+  b.style.top  = pos.y + "px"
+  arena.appendChild(b)
+  return b
+}
+
+const criarBroche = (pos) => {
+  const b = document.createElement("div")
+  b.className = "broche"
+  b.style.left = pos.x + "px"
+  b.style.top  = pos.y + "px"
+  arena.appendChild(b)
+  return b
+}
+// obs: lembar de detalhar tudo melhor no código final
+// rhuan, não tô conseguin do colocar a colisão com os blocos normais tente aí
+// define onde cada elemento começa na tela
+const EstadoObst = {x: 100, y: 300}
+const EstadoInicial = {x: 100, y: 120}
 const BrocheInicial = {x: 100, y: 200}
-const gameoverInicial = {x: 0 , y: 0}
-const inimigoInicial = {x:400, y: 20}
+const ini2 = {x: 500, y: 200}
+const gameoverInicial = {x: 0, y: 0}
+const inimigoInicial = {x: 400, y: 20}
+
+// coloca os elementos na arena
 const InimigoOficial = criarInimigo(inimigoInicial)
 const bloco = criarBloco(EstadoInicial)
 const broche = criarBroche(BrocheInicial)
+const obsta = gerarObs(EstadoObst)
+const inim2 = criarInimigo(ini2)
+
+// calcula a nova posição do jogador baseado na tecla apertada
 const mover = (estado, tecla) => {
-    const passo = 10
-    const maxX = arena.clientWidth - 50
-    const maxY = arena.clientHeight - 50
-    const novo = {
-        x: tecla === 'ArrowRight' ? estado.x + passo : tecla === 'ArrowLeft'  ? estado.x - passo : estado.x,
-        y: tecla === 'ArrowUp'    ? estado.y - passo : tecla === 'ArrowDown' ? estado.y + passo : estado.y
-    }
-    return {
-      x: Math.min(Math.max(novo.x, 0), maxX),
-      y: Math.min(Math.max(novo.y, 0), maxY)
-    }
+  const passo = 20
+  const maxX = arena.clientWidth - 50
+  const maxY = arena.clientHeight - 50
+  const novo = {
+    x: tecla === 'ArrowRight' ? estado.x + passo : tecla === 'ArrowLeft' ? estado.x - passo : estado.x,
+    y: tecla === 'ArrowUp' ? estado.y - passo : tecla === 'ArrowDown' ? estado.y + passo : estado.y
+  }
+  return {
+    x: Math.min(Math.max(novo.x, 0), maxX),
+    y: Math.min(Math.max(novo.y, 0), maxY)
+  }
 }
 
-
+// escuta as teclas e move o bloco
+// se encostar no broche mostra a tela de fim de jogo
 const loop = (estado) => {
-
-    document.addEventListener('keydown', (e) => {
-        const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft']
-        if (teclas.includes(e.key)) {
-            const novo = mover(estado, e.key)
-            if((novo.x - BrocheInicial.x) < 15 && (novo.x - BrocheInicial.x) > -15 && (novo.y - BrocheInicial.y) > -5 && (novo.y - BrocheInicial.y) < 5 ){    
-                const GameOverdeCria = criarGameOver(gameoverInicial)
-            }
-            else{
-                bloco.style.left = novo.x + "px"
-                bloco.style.top  = novo.y + "px"
-                loop(novo)
-            }
-        }
-        else{
-            loop(estado)
-        }
-
-    },{once: true})
+  document.addEventListener('keydown', (e) => {
+    const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft']
+    if (teclas.includes(e.key)) {
+      const novo = mover(estado, e.key)
+      const blocoX = parseInt(bloco.style.left, 10)
+      const blocoY = parseInt(bloco.style.top, 10)
+      const brochex = BrocheInicial.x
+      const brochey = BrocheInicial.y
+      const distanciaxb = blocoX - brochex
+      const distanciayb = blocoY - brochey
+      const distb = Math.sqrt(distanciaxb**2 + distanciayb**2) || 1
+      if (distb < 22) {
+        criarGameOver(gameoverInicial)
+      } else {
+        bloco.style.left = novo.x + "px"
+        bloco.style.top  = novo.y + "px"
+        loop(novo)
+      }
+    } else {
+      loop(estado)
+    }
+  }, {once: true})
 }
-const moverInimigo = (inimigo) =>{
-    const passo = 3
-    const blocoX = parseInt(bloco.style.left,10)
-    const blocoY = parseInt(bloco.style.top,10)
-    const inimigoX = parseInt(inimigo.style.left,10)
-    const inimigoY = parseInt(inimigo.style.top,10)
-    const distanciax = blocoX - inimigoX
-    const distanciay = blocoY - inimigoY
-    const dist = Math.sqrt(distanciax*2 + distanciay*2) || 1;
+
+// inimigos se movem em direção ao jogador
+// se chegarem perto demais aparece o game over
+const moverInimigo = (inimigo, inimigo2) => {
+  const passo = 3
+  const blocoX = parseInt(bloco.style.left, 10)
+  const blocoY = parseInt(bloco.style.top, 10)
+  const inimigoX = parseInt(inimigo.style.left, 10)
+  const inimigoY = parseInt(inimigo.style.top, 10)
+  const inimigoX1 = parseInt(inimigo2.style.left, 10)
+  const inimigoY1 = parseInt(inimigo2.style.top, 10)
+  const distanciax1 = blocoX - inimigoX1
+  const distanciay1 = blocoY - inimigoY1
+  const dist1 = Math.sqrt(distanciax1**2 + distanciay1**2) || 1
+  const distanciax = blocoX - inimigoX
+  const distanciay = blocoY - inimigoY
+  const dist = Math.sqrt(distanciax**2 + distanciay**2) || 1
+  if (dist < 50 || dist1 < 50) {
+    criarGameOver(gameoverInicial)
+  } else {
     const novo = {
-        x: inimigoX + (distanciax/dist) * passo,
-        y: inimigoY + (distanciay/dist) * passo
+      x: inimigoX + (distanciax / dist) * passo,
+      y: inimigoY + (distanciay / dist) * passo
     }
     inimigo.style.left = novo.x + "px"
     inimigo.style.top  = novo.y + "px"
-    if((Math.abs(blocoX - inimigoX) < 25 ) || (Math.abs(blocoY - inimigoY) < 25)){
-        const pegou = criarGameOver(gameoverInicial)
+    const novo2 = {
+      x: inimigoX1 + (distanciax1 / dist1) * 6,
+      y: inimigoY1 + (distanciay1 / dist1) * 6
     }
-    else{
-        setTimeout(() => moverInimigo(inimigo), 16)
-    } 
+    inimigo2.style.left = novo2.x + "px"
+    inimigo2.style.top  = novo2.y + "px"
+    setTimeout(() => moverInimigo(inimigo, inimigo2), 32)
+  }
 }
+
+// inicia o jogo chamando o movimento do jogador e dos inimigos
 loop(EstadoInicial)
-moverInimigo(InimigoOficial)
+moverInimigo(InimigoOficial, inim2)
 
 </script>
 </body>
