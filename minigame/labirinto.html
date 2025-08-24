@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Labirinto Puzzle</title>
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #111;
+  }
+  .obst {
+    position: absolute;
+    width: 40px;
+    height: 20px;
+    background: #250bec;
+    border-radius: 0px;
+  }
+  .arena {
+    position: relative;
+    width: 1300px;
+    height: 700px;
+    background: #222;
+    border: 3px solid #555;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .bloco {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #880afe;
+    border-radius: 99px;
+  }
+   .broche {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #f20808;
+    border-radius: 99px;
+    }
+    .gameover {
+    position: absolute;
+    width: 1300px;
+    height: 700px;
+    background: #ffd700;
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+  <div class="arena" id="arena"></div>
+<script>
+
+const arena = document.getElementById("arena")
+
+const criarBloco = (pos) => {
+    const b = document.createElement("div")
+    b.className = "bloco"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+}
+
+const criarGameOver = (pos) => {
+    const b = document.createElement("div")
+    b.className = "gameover"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+}
+const criarBroche = (pos) => {
+    const b = document.createElement("div")
+    b.className = "broche"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+}
+const EstadoObst = {x: 100, y:300, height: 30, width: 30} 
+const EstadoInicial = {x: 50, y: 350, width: 20, height: 20}
+const BrocheInicial = {x: 1140, y: 325}
+const gameoverInicial = {x: 0 , y: 0}
+const bloco = criarBloco(EstadoInicial)
+const broche = criarBroche(BrocheInicial)
+
+
+const mover = (estado, tecla) => {
+    const passo = 10
+    const maxX = arena.clientWidth - 50
+    const maxY = arena.clientHeight - 20
+
+    const novo = {
+        x: tecla === 'ArrowRight' ? estado.x + passo : tecla === 'ArrowLeft'  ? estado.x - passo : estado.x,
+        y: tecla === 'ArrowUp'    ? estado.y - passo : tecla === 'ArrowDown' ? estado.y + passo : estado.y,
+        width: estado.width,
+        height: estado.height
+    }
+
+    if (labirinto.some(obst => colisao(obst, novo))) {
+    return estado
+} else { const novo2 = {
+        x: Math.min(Math.max(novo.x, 0), maxX),
+        y: Math.min(Math.max(novo.y, 0), maxY),
+        width: estado.width,
+        height: estado.height}
+        return novo2
+    }
+}
+const loop = (estado) => {
+
+    document.addEventListener('keydown', (e) => {
+        const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft']
+        if (teclas.includes(e.key)) {
+            const novo = mover(estado, e.key)
+            const blocoX = parseInt(bloco.style.left,10)
+            const blocoY = parseInt(bloco.style.top,10)
+            const brochex = parseInt(BrocheInicial.x)
+            const brochey = parseInt(BrocheInicial.y)
+            const distanciaxb = blocoX - brochex
+            const distanciayb = blocoY - brochey
+            const distb = Math.sqrt(distanciaxb**2 + distanciayb**2) || 1
+            if(distb < 22){
+                const pegou = criarGameOver(gameoverInicial)
+            }
+            else{
+                bloco.style.left = novo.x + "px"
+                bloco.style.top  = novo.y + "px"
+                loop(novo)
+            }
+        }
+        else{
+            loop(estado)
+        }
+
+    },{once: true})
+}
+
+
+const colisao = (obstaculo, player) => {
+    if (player.x < obstaculo.x + obstaculo.width &&
+    player.x + player.width > obstaculo.x &&
+    player.y < obstaculo.y + obstaculo.height &&
+    player.y + player.height > obstaculo.y){
+        return true
+    }
+    else{
+        return false
+    }
+
+}
+loop(EstadoInicial)
+
+</script>
+</body>
+</html>
