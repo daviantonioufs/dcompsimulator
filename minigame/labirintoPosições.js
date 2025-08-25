@@ -9,7 +9,6 @@ const labirinto = [
   {x: 300, y: 20, width: 40, height: 20},
   {x: 340, y: 20, width: 40, height: 20},
   {x: 380, y: 20, width: 40, height: 20},
-  {x: 420, y: 20, width: 40, height: 20},
   {x: 460, y: 20, width: 40, height: 20},
   {x: 540, y: 20, width: 40, height: 20},
   {x: 620, y: 20, width: 40, height: 20},
