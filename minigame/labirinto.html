@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <title>Labirinto Puzzle</title>
 <style>
-body {
+
+  /* Estilização do corpo da página */
+  body {
     margin: 0;
     height: 100vh;
     display: flex;
@@ -12,6 +14,8 @@ body {
     align-items: center;
     background: #111;
   }
+
+  /* Estilo dos obstáculos */
   .obst {
     position: absolute;
     width: 40px;
@@ -19,6 +23,8 @@ body {
     background: #250bec;
     border-radius: 0px;
   }
+
+  /* Estilo da arena principal do jogo */
   .arena {
     position: relative;
     width: 1300px;
@@ -29,6 +35,7 @@ body {
     overflow: hidden;
   }
 
+  /* Estilo do jogador */
   .bloco {
     position: absolute;
     width: 20px;
@@ -36,66 +43,73 @@ body {
     background: #880afe;
     border-radius: 99px;
   }
-   .broche {
+
+  /* Estilo do broche */ 
+  .broche {
     position: absolute;
     width: 20px;
     height: 20px;
     background: #f20808;
     border-radius: 99px;
-    }
-    .gameover {
-    position: absolute;
-    width: 1300px;
-    height: 700px;
-    background: #ffd700;
-    border-radius: 8px;
   }
+
+
 </style>
 </head>
 <body>
   <div class="arena" id="arena"></div>
+
+<script src="labirinto.js"></script> 
 <script>
 
-const arena = document.getElementById("arena")
+const arena = document.getElementById("arena") // Seleciona a arena do jogo
 
+// Função que cria o bloco do jogador baseado no id 'bloco' e suas dimensões definido nos estilos
 const criarBloco = (pos) => {
     const b = document.createElement("div")
     b.className = "bloco"
     b.style.left = pos.x + "px"
     b.style.top  = pos.y + "px"
-    arena.appendChild(b)
+    arena.appendChild(b) // aqui adiciona ele a arena
     return b
 }
 
-const criarGameOver = (pos) => {
-    const b = document.createElement("div")
-    b.className = "gameover"
-    b.style.left = pos.x + "px"
-    b.style.top  = pos.y + "px"
-    arena.appendChild(b)
-    return b
-}
+// Função para criar o broche que deve ser capturado pelo jogador
 const criarBroche = (pos) => {
     const b = document.createElement("div")
     b.className = "broche"
     b.style.left = pos.x + "px"
     b.style.top  = pos.y + "px"
-    arena.appendChild(b)
+    arena.appendChild(b) // aqui adiciona ele a arena
     return b
 }
-const EstadoObst = {x: 100, y:300, height: 30, width: 30} 
+
+// Estados iniciais do broche e jogador (do labirinto está em outro arquivo) 
 const EstadoInicial = {x: 50, y: 350, width: 20, height: 20}
 const BrocheInicial = {x: 1140, y: 325}
 const gameoverInicial = {x: 0 , y: 0}
+
+// Criação dos elementos iniciais baseados na função e o argumento da posição
 const bloco = criarBloco(EstadoInicial)
 const broche = criarBroche(BrocheInicial)
 
+// Criação dos obstáculos definidos no arquivo labirinto.js lá no script html
+// itera toda lista aplicando a posição de cada registro para gerer um bloco (baseado no estilo do css) e adicionar a arena
+labirinto.forEach(pos => {
+    const o = document.createElement("div");
+    o.className = "obst";
+    o.style.left = pos.x + "px"
+    o.style.top  = pos.y + "px"
+    arena.appendChild(o) // obstaculos são adicionados
+})
 
+// Função que move o jogador com base na tecla pressionada
 const mover = (estado, tecla) => {
-    const passo = 10
+    const passo = 10 // distância de movimento por tecla
     const maxX = arena.clientWidth - 50
     const maxY = arena.clientHeight - 20
 
+    // Calcula nova posição com base na tecla
     const novo = {
         x: tecla === 'ArrowRight' ? estado.x + passo : tecla === 'ArrowLeft'  ? estado.x - passo : estado.x,
         y: tecla === 'ArrowUp'    ? estado.y - passo : tecla === 'ArrowDown' ? estado.y + passo : estado.y,
@@ -103,46 +117,71 @@ const mover = (estado, tecla) => {
         height: estado.height
     }
 
-    if (labirinto.some(obst => colisao(obst, novo))) {
-    return estado
-} else { const novo2 = {
-        x: Math.min(Math.max(novo.x, 0), maxX),
-        y: Math.min(Math.max(novo.y, 0), maxY),
-        width: estado.width,
-        height: estado.height}
+    // registro que guarda a nova posição baseado no addEventlistener e testa colisão
+    const TestarColisão = labirinto.map((obs) => colisao(obs,novo))
+    const filtro = TestarColisão.filter((obs) => obs === true)
+
+    // Se houver colisão, retorna estado atual
+    if(filtro.length > 0){
+      return estado
+       // teste de colisão, usando um map para aplicar a função colisão que ainda vai ser definida,
+    // usando um map para aplicar a função para todos, retornando arrays de true e false, o filtro
+    // aliado com o .length ve se existe mais de zero colisões e caso afirmativo, retorna a posição
+    // atual!
+    } 
+    else {
+        // Garante que o jogador fique dentro dos limites da arena caso não haja colisão
+        const novo2 = {
+            x: Math.min(Math.max(novo.x, 0), maxX),
+            y: Math.min(Math.max(novo.y, 0), maxY),
+            width: estado.width,
+            height: estado.height}
         return novo2
     }
 }
+
+// loop principal para ler as teclas e atualizar posição
+// ativamente move o personagem baseado nas coordenadas definidas pela função mover
 const loop = (estado) => {
 
     document.addEventListener('keydown', (e) => {
-        const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft']
+        const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft'];
         if (teclas.includes(e.key)) {
             const novo = mover(estado, e.key)
-            const blocoX = parseInt(bloco.style.left,10)
-            const blocoY = parseInt(bloco.style.top,10)
+            // observa se a tecla esta inclusa no lista definida e em caso afimativo chama a função de movimentação definida acima
+            const blocoX = parseInt(bloco.style.left,10)// converte as as cordenadas do personagem, definida em px, para inteiro na
+            const blocoY = parseInt(bloco.style.top,10) // converte as as cordenadas do personagem, definida em px, para inteiro na base 10
             const brochex = parseInt(BrocheInicial.x)
-            const brochey = parseInt(BrocheInicial.y)
+            const brochey = parseInt(BrocheInicial.y)// a mesma ideia pro do personagem
             const distanciaxb = blocoX - brochex
             const distanciayb = blocoY - brochey
-            const distb = Math.sqrt(distanciaxb**2 + distanciayb**2) || 1
+            const distb = Math.sqrt(distanciaxb**2 + distanciayb**2)
+            // caucula a distancia entre broche e personagem (distancia entyre dois pontos)
             if(distb < 22){
-                const pegou = criarGameOver(gameoverInicial)
+                // se a distancia for menosr que 22 px o jogo é finalizado e vencido
+                
             }
             else{
+                // caso nao tenha a distancia correta o jogo retorna o loop de movimento com o novo estado
                 bloco.style.left = novo.x + "px"
                 bloco.style.top  = novo.y + "px"
                 loop(novo)
             }
         }
         else{
+            // Se tecla não estiver na lista continua o loop sem mover, retornando o mesmo estado
             loop(estado)
         }
 
-    },{once: true})
-}
+    },{once: true}); // Garante que o evento seja escutado uma vez por ciclo
+}// processo que permite que a recursão não seja 
+  // gerada infinitamente, já que o once true apaga o listener após 
+  // ele ser efetuado, mas como esta em um processo recursivo, 
+  // ele reinicia, o que impede que dê stack overflow. 
 
 
+// Função que verifica colisão entre jogador e obstáculo
+// colisão do tipo AABB clássica
 const colisao = (obstaculo, player) => {
     if (player.x < obstaculo.x + obstaculo.width &&
     player.x + player.width > obstaculo.x &&
@@ -153,8 +192,9 @@ const colisao = (obstaculo, player) => {
     else{
         return false
     }
-
 }
+
+// Inicia o jogo com estado inicial definido
 loop(EstadoInicial)
 
 </script>
