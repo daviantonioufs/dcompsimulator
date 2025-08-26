@@ -459,7 +459,7 @@ const renderizarCena = (cenaId) => {
       document.querySelector(".novel").style.display = "block"
       document.querySelector(".faladopersonagem").textContent = base.dialogo
       document.querySelector(".avatar").src = base.avatar
-      document.querySelector(".cenario").style.backgroundImage = url(${base.cenario})
+      document.querySelector(".cenario").style.backgroundImage = `url(${base.cenario})`
       document.querySelector(".caixadeescolhas").innerHTML = base.opcoes.reduce((html,escolha) => 
       html + <div class="escolha" onclick="renderizarCena('${escolha.proximaCena}')">${escolha.texto}</div>, "")
     }
