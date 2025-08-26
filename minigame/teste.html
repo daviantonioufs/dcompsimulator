@@ -199,8 +199,8 @@ const mover = (estado, tecla) => {
         width: estado.width,
         height: estado.height
       };
-    // bloco de função que testa colisão com a entidade obstáculo, como a função colisão foi feita após a movimentação
-    // ela é chamada antes mesmo de ser definida, sendo só feita no final do código.
+    // caso não exista colisão com o obstaculo, testa a colisão com a arena
+    // e retorna ou a nova movimentação, ou o maximo da arena!
   }
 }
   const broches = [
@@ -234,7 +234,7 @@ const MoverPersonagem = (estado,broches,EntBroches) => {
       renderPersonagem(novo)
       // aplica a função impura que mexe no DOM 
       // e pinta o bloco na nova posição no CSS
-      if(ColetaDeBroches(broches,EntBroches) === true){
+      if(ColetaDeBroches(novo,broches,EntBroches) === true){
         MoverPersonagem(novo,broches.slice(1),EntBroches.slice(1))
       }
       // implementação recursiva que chama a função Coleta de Broches
@@ -314,21 +314,24 @@ const render = (player,inimigo1,inimigo2) =>{
   // para o CSS
 }
 const renderPersonagem = (estado) =>{
-  bloco.style.left = estado.x + 'px'
-  bloco.style.top = estado.y + 'px'
+  bloco.style.left = estado.x + "px"
+  bloco.style.top = estado.y + "px"
   // função que mexe no DOM e renderiza o player
 }
 const FunçãoAuxiliarColeta = (listaQualquer) =>{
-  return listaQualquer.map((x) => x.style.display = 'none')
+  return listaQualquer.map((x) => x.style.display = "none")
 }
+// função auxiliar que desliga a imagem de uma lista de elementos!
 const FunçãoAuxiliarColeta2 = (x) =>{
-  return x.style.display = 'block'
+  return x.style.display = "block"
 }
+// função auxiliar que liga a imagem de algum elemento!
 const FunçãoAuxiliarColeta3 = (x) =>{
-  return x.style.display = 'none'
+  return x.style.display = "none"
 }
+// função auxiliar que desliga a imagem de algum elemento!
 FunçãoAuxiliarColeta(EntidadesBroches)
-const ColetaDeBroches = (estadosBroches, ElementosBroches) =>{
+const ColetaDeBroches = (estado,estadosBroches, ElementosBroches) =>{
   if(estadosBroches.length === 0){
     const GameWon = criarGameOver(gameoverInicial)
     return
@@ -336,16 +339,21 @@ const ColetaDeBroches = (estadosBroches, ElementosBroches) =>{
 // como acaba sendo aplicado em um processo
 // recursivo, precisa do caso base, que no caso
 // é quando todos os broches são coletados
-  const BlocoX = parseInt(bloco.style.left,10)
-  const BlocoY = parseInt(bloco.style.top,10)
   const CoordenadasBrocheAtual = estadosBroches[0]
   const EntidadeBrocheAtual = ElementosBroches[0]
+// só constantes necessárias para acessar o broche específico!
   FunçãoAuxiliarColeta2(EntidadeBrocheAtual)
+  // liga o display do broche atual, é importante no processo recursivo
+  // por que o que virá abaixo vai desligar o display, então acabava que 
+  // apartir do primeiro todos ficavam desligados, o que não era a ideia.
   const filtro = ElementosBroches.filter((broche) => broche !== EntidadeBrocheAtual)
   FunçãoAuxiliarColeta(filtro)
-  const distanciax = CoordenadasBrocheAtual.x - BlocoX
-  const distanciay = CoordenadasBrocheAtual.y - BlocoY
+  // desliga todos os displays que não são o broche atual
+  const distanciax = CoordenadasBrocheAtual.x - estado.x
+  const distanciay = CoordenadasBrocheAtual.y - estado.y
   const dist = Math.sqrt(distanciax**2 + distanciay**2)
+  // calculo de vetor distância do mesmo jeito dos inimigos
+  // mas só calcula a distância mesmo
   if(dist < 50){
     FunçãoAuxiliarColeta3(EntidadeBrocheAtual)
     return true
@@ -353,6 +361,8 @@ const ColetaDeBroches = (estadosBroches, ElementosBroches) =>{
   else{
     return false
   }
+  // retorna true ou false que é trabalhado la na função
+  // mover personagem!
 }
 const colisao = (obstaculo, player) => {
     if (player.x < obstaculo.x + obstaculo.width &&
@@ -364,7 +374,8 @@ const colisao = (obstaculo, player) => {
     else{
         return false
     }
-// função de colisão do tipo AABB clássica!
+// função de colisão do tipo AABB clássica! baseado no tutorial
+// disponível em: https://tutorialedge.net/gamedev/aabb-collision-detection-tutorial/
 }
 // função de start do jogo, que ve o addEventListener para o Enter
 // e inicia as duas funções de start do jogo, o loop e o moverInimigo
@@ -378,11 +389,9 @@ const FuncaoStart = () =>{
       }
     },{once: true})
 }
+// Função de Start do jogo, que liga as funções necessárias
+// para iniciar o jogo após o evento 'Enter'.
 FuncaoStart()
-
-// VOU RECOMENTAR COM MAIS AFINCO QUANDO PUDER, tenho que terminar os comentarios ainda,
-// mas agora eu to atrasado!!!!!
-
 </script>
 </body>
 </html>
