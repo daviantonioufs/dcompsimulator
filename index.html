@@ -27,6 +27,29 @@
         min-height: 560px;
 }
 
+ .btn{
+        box-sizing: inherit;
+        font-family: Arvo, serif;
+        background-color: rgb(91, 20, 222);
+        text-shadow: 0 1px 2px rgb(50, 13, 118);
+        border: none;
+        border-bottom-right-radius: 9px;
+        border-top-right-radius: 9px;
+        background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.2));
+        box-shadow: -1px -1px 6.72px .28px #0006;
+        padding: 11px 10px 10px 20px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        position: absolute;
+        top: 7px;
+        left: -10px;
+        cursor: pointer;
+        transition: left 0.3s;
+        pointer-events: auto;
+        display: inline-block;
+}
+
 .cenario{
         width: 878px;
         margin: auto;
@@ -103,6 +126,78 @@
         max-width: 23.75%;
         font-family: Arvo, serif;
     }
+/*Aqui vamos implementar os elementos que serão unificados dos minigames com a novel*/
+ .obst {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: #250bec;
+    border-radius: 8px;
+    z-index: 4;
+  }
+  .arena {
+    display: none;
+    margin: auto;
+    position: relative;
+    width: 1300px;
+    height: 600px;
+    background: #222;
+    border: 3px solid #555;
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 2;
+  }
+
+  .bloco {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: #0aee5d;
+    border-radius: 8px;
+    z-index: 4;
+  }
+    .broche {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #f20808;
+    border-radius: 20px;
+    z-index: 2;
+    }
+    .gameover {
+    position: absolute;
+    width: 1300px;
+    height: 600px;
+    background: #ffd700;
+    border-radius: 8px;
+    z-index: 10;
+  }
+    .TelaInicial {
+    position: absolute;
+    width: 1300px;
+    height: 600px;
+    background: #ffd700;
+    border-radius: 8px;
+    z-index: 10;
+  }
+
+  .inimigo {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: #e00909;
+    border-radius: 8px;
+    z-index: 4;
+  }
+
+   .brocheCobertor {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: #222;
+    border-radius: 20px;
+    z-index: 3;
+    }
     </style>
 </head>
 <body>
@@ -110,6 +205,7 @@
         <source src="assets/jazz-lounge-elevator-music-332339.mp3" type="audio/mpeg">
         <!--Música adicionada com sucesso!-->
     </audio>
+    <div class="arena" id="arena"></div>
     <div class="novel">
         <div class="faladopersonagem"></div>
         <div class="cenario"></div>
@@ -120,7 +216,9 @@
             <div class="escolha"></div>
         </div>
     </div>
+    <button class="btn">Início</button>
 </body>
+<script src="labirinto.js"></script>
 <script>
 
 //Aqui temos a lista com o objeto que representam os personagens, contendo o id deles e o url do avatar que será exibido 
@@ -128,7 +226,10 @@
 const personagens = {
    pinguitor: {nome: 'Pinguitor', avatar: 'assets/pinguitor.png'},
    goodways: {nome: 'Good Ways', avatar: 'assets/goodways.png'},
-   kalelfreira: {nome: 'Kal-El Freira', avatar:'assets/kal-elfeliz.png'}
+   kalelfreira: {nome: 'Kal-El Freira', avatar: 'assets/kal-elfeliz.png'},
+   kalelfreirabravo: {nome: 'Kal-El Freira', avatar: 'assets/kal-elbravo.png'},
+   badways: {nome: 'Bad Ways', avatar: 'assets/badways.png'},
+   bigc: {nome: 'Big C', avatar: 'assets/bigcarlos-triste.png'}
 }
 
 //Aqui criamos outra lista que contém as cenas. Elas detalham o personagem pelo id da lista anterior (puxa o avatar e o nome do personagem)
@@ -151,7 +252,7 @@ const cenas = {
     opcoes: [
       {opcao: 1, texto: 'A. Rota do Peregrino' , proximaCena: 'apresentacaogoodways'},
       {opcao: 2, texto: 'B. Rota do Arauto das Normas' , proximaCena: 'olakalelfreira'}, //tinhamos cometido um erro no nome da rota
-      {opcao: 3, texto: 'C. Rota do Broche (em construção)' , proximaCena: 'uminimigoteespera'}
+      {opcao: 3, texto: 'C. Rota do AdCoffee' , proximaCena: 'uminimigoteespera'}//mudança no nome da rota
     ]
   },
 
@@ -164,12 +265,148 @@ const cenas = {
     ]
   },
 
+  explicacaosbc: {
+    personagem: 'goodways',
+    cenario: 'assets/ufs_resun.jpg',
+    dialogo: 'A SBC é a Sociedade Brasileira de Computeiros: é ela que contribui desde a formação da grade dos cursos à eventos da área!',
+    opcoes: [
+      {opcao: 1, texto: 'A. Legal... Mas quando vamos começar os "Bons Caminhos"?' , proximaCena: 'comecodajornada'}
+    ]
+  },
+
+  comecodajornada: {
+    personagem: 'goodways',
+    cenario: 'assets/ufs_resun.jpg',
+    dialogo: 'Pelo visto você sabe! Bom, já que insiste, lhe mostrarei os bons caminhos. É bem simples até.',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Próxima Cena)' , proximaCena: 'explicacaodolabirinto'}
+    ]
+  },
+
+  explicacaodolabirinto: {
+    personagem: 'goodways',
+    cenario: 'assets/ufs_resun.jpg',
+    dialogo: 'Consiste em um labirinto que te levará direto para o segredo de como codar melhor e se tornar um verdadeiro dcomper.',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Próxima Cena)' , proximaCena: 'vamospraolabirinto'}
+    ]
+  },
+
+vamospraolabirinto: {
+    personagem: 'goodways',
+    cenario: 'assets/ufs_resun.jpg',
+    dialogo: 'Se você falhar, meu alter ego, Bad Ways, vai te jubilar e será o fim da linha! Está pronto?',
+    opcoes: [
+      {opcao: 1, texto: 'A. Gulp! Acho que sim' , proximaCena: 'labirinto'}
+    ]
+  },
+
+  venceulabirinto: {
+    personagem: 'goodways',
+    cenario: 'assets/ufs_resun.jpg',
+    dialogo: 'Dcomper, viva! Você concluiu a missão com êxito, aqui está!',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Pegar o Pergaminho do Poderoso Dev)' , proximaCena: 'pergaminho'}
+    ]
+  },
+
+  perdeulabirinto: {
+    personagem: 'goodways',
+    cenario: 'assets/ufs_resun.jpg',
+    dialogo: 'Dcomper, desviva! Como punição você foi jubilado! E sem mais conversas! Maus caminhos!',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Voltar como castigo de Bad Ways)' , proximaCena: 'inicio'}
+    ]
+  },
+
    olakalelfreira: {
     personagem: 'kalelfreira',
     cenario: 'assets/ufs_reitoria.jpg',
     dialogo: 'Olá, dcomper! Me chamo Kal-el Freira e lhe ensinarei sobre o conjunto de normas que rege esta Cidade Universitária!',
     opcoes: [
       {opcao: 1, texto: 'A. É tipo etiqueta?' , proximaCena: 'aufseumaselva'}
+    ]
+  },
+
+  aufseumaselva: {
+    personagem: 'kalelfreira',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Não! Vamos lá: imagine que a UFS é um selva. Aqui você encontrará todo tipo de bicho: do mais pacífico até o mais feroz',
+    opcoes: [
+      {opcao: 1, texto: 'A. Eita, pêga! Mas o que as normas tem a ver com isso?' , proximaCena: 'kalelexplicaasnormas'}
+    ]
+  },
+
+  kalelexplicaasnormas: {
+    personagem: 'kalelfreira',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Elas são os artefatos que lhe protegem desses predadores e garante o sucesso em sua jornada!',
+    opcoes: [
+      {opcao: 1, texto: 'A. Como eu consigo as normas?' , proximaCena: 'kaleltedaumamissao'}
+    ]
+  },
+
+  kaleltedaumamissao: {
+    personagem: 'kalelfreira',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Sou eu quem as guardo! Mas para te dar as normas vou te fazer perguntas e se responder corretamente, você terá a chave para as normas!',
+    opcoes: [
+      {opcao: 1, texto: 'A. Moleza, moleza' , proximaCena: 'kaleldaumaviso'}
+    ]
+  },
+
+    kaleldaumaviso: {
+    personagem: 'kalelfreirabravo',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Não se engane, jovem! Você verá que esse desafio não é um mero jogo, se errar você será JUBILADO!',
+    opcoes: [
+      {opcao: 1, texto: 'A. Tá, vamo lá...' , proximaCena: 'kaleldaumaviso'}
+    ]
+  },
+
+    uminimigoteespera: {
+    personagem: 'pinguitor',
+    cenario: 'assets/ufs_adufs.jpg',
+    dialogo: 'Aqui rezam as lendas de que você consegue café de graça, mas existe um inimigo poderoso. Você quer enfrentá-lo?',
+    opcoes: [
+      {opcao: 1, texto: 'A. Vamos nessa!' , proximaCena: 'minigame'}
+    ]
+  },
+  
+  ganhouminigame: {
+    personagem: 'pinguitor',
+    cenario: 'assets/ufs_adufs.jpg',
+    dialogo: 'Você consegui, siga pela porta pra pegar sua recompensa!',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Entrar no AdCoffee)' , proximaCena: 'pegarcafe'}
+    ]
+  },
+
+  pegarcafe: {
+    personagem: 'bigc',
+    cenario: 'assets/ufs_adufs.jpg',
+    dialogo: 'Tenho que admitir minha derrota, aqui está jovem!',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Pegar café)' , proximaCena: 'cafe'}
+    ]
+  },
+
+  cafe: {
+    personagem: '',
+    cenario: 'assets/fotocafe.jpg',
+    dialogo: 'Você obteve o café do AdCoffee!',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Escolher outra rota)' , proximaCena: 'escolhaderotas'}
+    ]
+  },
+
+  perdeuminigame: {
+    personagem: 'pinguitor',
+    cenario: 'assets/ufs_adufs.jpg',
+    dialogo: 'Não foi dessa vez. O que pretende fazer?',
+    opcoes: [
+      {opcao: 1, texto: 'A. Revanche!' , proximaCena: 'minigame'},
+      {opcao: 2, texto: 'B. Escolher outra rota' , proximaCena: 'escolhaderotas'} //erro sutil corrigido, as opções estavam com o mesmo número
     ]
   }
 }
@@ -192,19 +429,310 @@ const carregarCena = (idCena) => {
 //as respostas como botões clicáveis, que envia o id pra passar de cena e exibe o texto da 
 //escolha da cena para o jogador identificar as opções.
 const renderizarCena = (cenaId) => {
+//Agora colocamos um condicional para adicionar script do jogo no meio da gameplay da novel e pra isso 
+//colocamos que quando o id da cena for minigame, ele vai desativar a novel, ativar a arena do jogo
+//e trazer a função que ativa o minigame, para então aperta Enter para começar. 
+// Se perder ou ganhar, uma nova tela será mostrada. Caso contrário, a novel carrega normalmente e o jogo segue
+//Em breve o labirinto será implementado da mesmma maneira.
+  if (cenaId === 'minigame') {
+      document.querySelector(".arena").style.display = "block"
+      document.querySelector(".novel").style.display = "none"
+      FuncaoStart()
+}
     const base = carregarCena(cenaId)
-
     document.querySelector(".faladopersonagem").textContent = base.dialogo
     document.querySelector(".avatar").src = base.avatar
     document.querySelector(".cenario").style.backgroundImage = `url(${base.cenario})`
     document.querySelector(".caixadeescolhas").innerHTML = base.opcoes.reduce((html,escolha) => 
     html + `<div class="escolha" onclick="renderizarCena('${escolha.proximaCena}')">${escolha.texto}</div>`, "")
-    
-}
+  }
+
+// Adicionamos um botão que vai pra o início do jogo em qualquer momento pra que não haja a necessidade de 
+// reiniciar a página toda hora sempre que quisermos voltar atrás na escolha de uma rota 
+// Para isso usamos um botão no html onde sua ativação acontece com o addEventListener em que ele
+// quando é clicado aciiona o botão que usa a const renzderizarCena pra ir pro início 
+//(Ainda precisa ser ajustado)
+const voltarInicio = document.querySelector(".btn")
+
+voltarInicio.addEventListener('click', () => {
+    renderizarCena('inicio')
+})
 
 //Aqui definimos qual a primeira cena que aparecerá quando a função for chamada, que no caso é a home do jogo
 //A ideia é aprimorar mais o jogo...
 renderizarCena('inicio')
 
+//Essa função é a que inicia o minigame e servirá de base para o labirinto
+const FuncaoStart = () =>{ 
+
+const gerarObs = (pos) => {
+    const o = document.createElement("div")
+    o.className = "obst"
+    o.style.left = pos.x + "px"
+    o.style.top  = pos.y + "px"
+    arena.appendChild(o)
+    return o
+
+}
+// função de criação da arena, pega o elemento pelo ID do css e cola diretamente.
+const arena = document.getElementById("arena")
+
+const criarBloco = (pos) => {
+    const b = document.createElement("div")
+    b.className = "bloco"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+// processo de criação das entidades, onde cada elemento tem seu ID do css e posição baseado nos registros localizados abaixo desse bloco de funções.
+};
+const criarInimigo = (pos) => {
+    const b = document.createElement("div")
+    b.className = "inimigo"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+    
+};
+const criarGameOver = (pos) => {
+    const b = document.createElement("div")
+    b.className = "gameover"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+}
+const criarTelaInicial = (pos) => {
+    const b = document.createElement("div")
+    b.className = "TelaInicial"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+}
+const criarBroche = (pos) => {
+    const b = document.createElement("div")
+    b.className = "broche"
+    b.style.left = pos.x + "px"
+    b.style.top  = pos.y + "px"
+    arena.appendChild(b)
+    return b
+}
+const criarBrocheCobertor = (pos) => {
+    const b = document.createElement("div")
+    b.className = "brocheCobertor"
+    b.style.left = (pos.x- 5) + "px"
+    b.style.top  = (pos.y - 5) + "px"
+    arena.appendChild(b)
+    return b
+};
+// bloco de registros onde marca as localizações das entidades geradas
+// baseado em um plano cartesiano
+const EstadoObst = {x: 100, y:300, height: 50, width: 50} 
+const EstadoObst1 = { x: 100, y: 300, width: 50, height: 50 }
+const EstadoObst2 = { x: 300, y: 100, width: 50, height: 50 }
+const EstadoObst3 = { x: 500, y: 400, width: 50, height: 50 }
+const EstadoObst4 = { x: 700, y: 200, width: 50, height: 50 }
+const EstadoObst5 = { x: 900, y: 350, width: 50, height: 50 }
+const EstadoObst6 = { x: 1100, y: 150, width: 50, height: 50 }
+const EstadoObst7 = { x: 600, y: 550, width: 50, height: 50 }
+const EstadoObst8 = { x: 1200, y: 500, width: 50, height: 50 }
+const EstadoInicial = { x: 650, y: 300, height: 50, width: 50}
+const ini2 = {x: 890, y: 500}
+const gameoverInicial = {x: 0 , y: 0}
+const inimigoInicial = {x:100, y: 20}
+// bloco de criação ativa das entidades, pegando as funções e aplicando a posição como parametro.
+const InimigoOficial = criarInimigo(inimigoInicial)
+const bloco = criarBloco(EstadoInicial)
+const estados = [EstadoObst1, EstadoObst2, EstadoObst3, EstadoObst4, EstadoObst5, EstadoObst6, EstadoObst7, EstadoObst8];
+// map que gera todos os obstaculos presentes no array estados
+const obstaculos = estados.map(estado => gerarObs(estado));
+const inim2 = criarInimigo(ini2)
+// função de movimentação, que calcula a posição baseado no addEventListener que virá a seguir!
+const mover = (estado, tecla) => {
+    const passo = 20
+    const maxX = arena.clientWidth - 50
+    const maxY = arena.clientHeight - 50
+    // delimitação de constantes importantes para o movimento, e colisão com a arena!
+    const novo = {
+        x: tecla === 'ArrowRight' ? estado.x + passo : tecla === 'ArrowLeft'  ? estado.x - passo : estado.x,
+        y: tecla === 'ArrowUp'    ? estado.y - passo : tecla === 'ArrowDown' ? estado.y + passo : estado.y,
+        width: estado.width,
+        height: estado.height
+    };
+    // registro que guarda a nova posição baseado no addEventlistener!
+    const TestarColisão = estados.map((obs) => colisao(obs,novo))
+    const filtro = TestarColisão.filter((obs) => obs === true)
+    if(filtro.length > 0){
+    // teste de colisão, usando um map para aplicar a função colisão que ainda vai ser definida,
+    // usando um map para aplicar a função para todos, retornando arrays de true e false, o filtro
+    // aliado com o .length ve se existe mais de zero colisões e caso afirmativo, retorna a posição
+    // atual!
+      return estado
+    } 
+    else {
+      return {
+        x: Math.min(Math.max(novo.x, 0), maxX),
+        y: Math.min(Math.max(novo.y, 0), maxY),
+        width: estado.width,
+        height: estado.height
+      };
+    // bloco de função que testa colisão com a entidade obstáculo, como a função colisão foi feita após a movimentação
+    // ela é chamada antes mesmo de ser definida, sendo só feita no final do código.
+  }
+}
+  const broches = [
+  { x: 50, y: 50 },
+  { x: 150, y: 100 },
+  { x: 250, y: 200 },
+  { x: 100, y: 400 },
+  { x: 300, y: 200 },
+  { x: 400, y: 100 },
+  { x: 600, y: 100 },
+  { x: 800, y: 250 },
+  { x: 1000, y: 300 },
+  { x: 1250, y: 400 },
+  { x: 200, y: 500 },
+  { x: 350, y: 50 },
+  { x: 750, y: 100 },
+  { x: 950, y: 250 },
+  { x: 1150, y: 300 }
+]
+// lista de posição dos broches que vão ser coletados!
+
+const EntidadesBroches = broches.map((broche) => criarBroche(broche))
+const loop = (estado, brocheAt,EntBroches) => {
+  if (brocheAt.length === 0) {
+    document.querySelector(".arena").style.display = "none"
+    document.querySelector(".novel").style.display = "block"
+    const pegou = renderizarCena('ganhouminigame')
+    return
+  }
+  // na ideia recursiva, calcula a quantidade broches restantes
+  // a recursão é melhor mostrada um pouco baixo
+  const brocheAtual = brocheAt[0]
+  // consta as coordenadas do broche atual
+  const BrocheEntidadeAtual = EntBroches[0]
+  // consta a entidade do broche atual, é importante para retirar e mostrar no CSS
+  const filtro = EntBroches.filter((broche) => broche !== BrocheEntidadeAtual)
+  // filtra todos os broches para além do broche atual!
+  const displayDesligado = filtro.map((broche) => broche.style.display = "none")
+  // desliga todos os broches que não são o atual no CSS
+  BrocheEntidadeAtual.style.display = "block"
+  // liga o display do broche atual
+
+
+// função que ativamente move o personagem baseado nas coordenadas definidas
+// pela função mover!
+  document.addEventListener('keydown', (e) => {
+    const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft']
+    if (teclas.includes(e.key)) {
+      const novo = mover(estado, e.key)
+      const distanciaxb = novo.x - brocheAtual.x
+      const distanciayb = novo.y - brocheAtual.y
+      const distb = Math.sqrt(distanciaxb **2 + distanciayb ** 2);
+      // calculo de distância entre o player e o broche
+      bloco.style.left = novo.x + "px"
+      bloco.style.top = novo.y + "px"
+
+      if (distb < 50) {
+        BrocheEntidadeAtual.style.display = "none"
+        loop(novo, brocheAt.slice(1),EntBroches.slice(1)) 
+        // após concluir que o player chegou perto suficiente
+        // do broche, reinicia a recursão, agora com os próximos
+        // broches
+      } else {
+        loop(novo,brocheAt,EntBroches)
+      }
+      // caso não reinicia a recursão com os mesmos broches
+    }
+    else{
+      loop(estado,brocheAt,EntBroches)
+      // caso não se mova, reinicia a recursão com os mesmos broches 
+      // e mesma posição
+    }
+  },{once:true});
+  // processo que permite que a recursão não seja 
+  // gerada infinitamente, já que o once true apaga o listener após 
+  // ele ser efetuado, mas como esta em um processo recursivo, 
+  // ele reinicia, o que impede que dê stack overflow. 
+};
+// função que realiza o movimento do inimigo!
+const moverInimigo = (inimigo, inimigo2) =>{
+    const passo = 3
+    const blocoX = parseInt(bloco.style.left,10)
+    const blocoY = parseInt(bloco.style.top,10)
+    const inimigoX = parseInt(inimigo.style.left,10)
+    const inimigoY = parseInt(inimigo.style.top,10)
+    const inimigoX1 = parseInt(inimigo2.style.left,10)
+    const inimigoY1 = parseInt(inimigo2.style.top,10)
+     // essa parte é importante, pois retira as coordenadas diretamente do css, 
+    // o que torna desnecessário realizar a recursão para atualizar
+    // a posição do inimigo!
+    const distanciax1 = blocoX - inimigoX1
+    const distanciay1 = blocoY - inimigoY1
+    const dist1 = Math.sqrt(distanciax1**2 + distanciay1**2) || 1
+    const distanciax = blocoX - inimigoX
+    const distanciay = blocoY - inimigoY
+    const dist = Math.sqrt(distanciax**2 + distanciay**2) || 1
+    // calculo de distância importante para mexer a entidade!
+    // o ou 1 é importante para impedir divisião por 0  
+    if(dist < 50 || dist1 < 50) {
+        document.querySelector(".arena").style.display = "none"
+        document.querySelector(".novel").style.display = "block"
+        const pegou = renderizarCena('perdeuminigame')
+      return
+    // calcula se o inimigo esta proximo o suficiente
+    // para te "pegar"
+  }
+
+    else{
+        const novo = {
+        x: inimigoX + (distanciax/dist) * passo,
+        y: inimigoY + (distanciay/dist) * passo
+        }
+        // caso não, movimenta as coordenadas do inimigo
+    inimigo.style.left = novo.x + "px"
+    inimigo.style.top  = novo.y + "px"
+    // passa as novas coordenadas pro CSS
+    const novo2 = {
+        x: inimigoX1 + (distanciax1/dist1) * 4.5,
+        y: inimigoY1 + (distanciay1/dist1) * 4.5
+    }
+    inimigo2.style.left = novo2.x + "px"
+    inimigo2.style.top  = novo2.y + "px"
+    // faz a mesma coisa, mas pro outro inimigo
+    setTimeout(() => moverInimigo(inimigo, inimigo2), 32)
+    // set time out, feito para rodar a função a cada 32 milisegundos
+  
+  } 
+}
+
+const colisao = (obstaculo, player) => {
+    if (player.x < obstaculo.x + obstaculo.width &&
+    player.x + player.width > obstaculo.x &&
+    player.y < obstaculo.y + obstaculo.height &&
+    player.y + player.height > obstaculo.y){
+        return true
+    }
+    else{
+        return false
+    }
+// função de colisão do tipo AABB clássica!
+
+}
+// função de start do jogo, que ve o addEventListener para o Enter
+// e inicia as duas funções de start do jogo, o loop e o moverInimigo
+  const CriarTela = criarTelaInicial(gameoverInicial)
+  document.addEventListener('keydown',(e) =>{
+    if(e.key === 'Enter'){
+        CriarTela.style.display = "none"
+        loop(EstadoInicial, broches,EntidadesBroches)
+        moverInimigo(InimigoOficial,inim2)
+      }
+    },{once: true})
+
+}
 </script>
 </html>
