@@ -223,108 +223,137 @@ const mover = (estado, tecla) => {
 // lista de posição dos broches que vão ser coletados!
 
 const EntidadesBroches = broches.map((broche) => criarBroche(broche))
-const loop = (estado, brocheAt,EntBroches) => {
-  if (brocheAt.length === 0) {
-    const pegou = criarGameOver(gameoverInicial)
-    return
-  }
-  // na ideia recursiva, calcula a quantidade broches restantes
-  // a recursão é melhor mostrada um pouco baixo
-  const brocheAtual = brocheAt[0]
-  // consta as coordenadas do broche atual
-  const BrocheEntidadeAtual = EntBroches[0]
-  // consta a entidade do broche atual, é importante para retirar e mostrar no CSS
-  const filtro = EntBroches.filter((broche) => broche !== BrocheEntidadeAtual)
-  // filtra todos os broches para além do broche atual!
-  const displayDesligado = filtro.map((broche) => broche.style.display = "none")
-  // desliga todos os broches que não são o atual no CSS
-  BrocheEntidadeAtual.style.display = "block"
-  // liga o display do broche atual
-
-
-// função que ativamente move o personagem baseado nas coordenadas definidas
-// pela função mover!
+// map que cria cada broche como entidade baseado na função CriarBroche
+// baseado em cada registro do array broches.
+const MoverPersonagem = (estado,broches,EntBroches) => {
   document.addEventListener('keydown', (e) => {
-    const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft']
-    if (teclas.includes(e.key)) {
+  // Escutador de eventos que mapeia qual tecla esta sendo pressionada!
       const novo = mover(estado, e.key)
-      const distanciaxb = novo.x - brocheAtual.x
-      const distanciayb = novo.y - brocheAtual.y
-      const distb = Math.sqrt(distanciaxb **2 + distanciayb ** 2);
-      // calculo de distância entre o player e o broche
-      bloco.style.left = novo.x + "px"
-      bloco.style.top = novo.y + "px"
-
-      if (distb < 50) {
-        BrocheEntidadeAtual.style.display = "none"
-        loop(novo, brocheAt.slice(1),EntBroches.slice(1)) 
-        // após concluir que o player chegou perto suficiente
-        // do broche, reinicia a recursão, agora com os próximos
-        // broches
-      } else {
-        loop(novo,brocheAt,EntBroches)
+      // nova constante que aplica a função mover
+      // ao estado atual, tendo como paramêtro a tecla pressionada
+      renderPersonagem(novo)
+      // aplica a função impura que mexe no DOM 
+      // e pinta o bloco na nova posição no CSS
+      if(ColetaDeBroches(broches,EntBroches) === true){
+        MoverPersonagem(novo,broches.slice(1),EntBroches.slice(1))
       }
-      // caso não reinicia a recursão com os mesmos broches
-    }
-    else{
-      loop(estado,brocheAt,EntBroches)
-      // caso não se mova, reinicia a recursão com os mesmos broches 
-      // e mesma posição
-    }
-  },{once:true});
-  // processo que permite que a recursão não seja 
-  // gerada infinitamente, já que o once true apaga o listener após 
-  // ele ser efetuado, mas como esta em um processo recursivo, 
-  // ele reinicia, o que impede que dê stack overflow. 
-};
-// função que realiza o movimento do inimigo!
-const moverInimigo = (inimigo, inimigo2) =>{
-    const passo = 3
-    const blocoX = parseInt(bloco.style.left,10)
-    const blocoY = parseInt(bloco.style.top,10)
+      // implementação recursiva que chama a função Coleta de Broches
+      // caso o personagem toque o broche, aplica a função para a proxima
+      // posição do array.
+      else{
+        MoverPersonagem(novo,broches,EntBroches)
+        // caso não, mantém o broche atual!
+      }
+  }, {once:true}) // aplicação do AddEventListener que apaga o listener após o evento ser ativado
+  // porém, por estar em um processo recursivo, o Listener retorna, isso impede que entre em um processo 
+  // de recursão infinita e trave o navegador!
+}
+// função que movimenta o primeiro inimigo!
+const moverInimigo = (player,inimigo) =>{
+    const velocidade = 3
+    const PlayerX = parseInt(player.style.left,10)
+    const PlayerY = parseInt(player.style.top,10)
     const inimigoX = parseInt(inimigo.style.left,10)
     const inimigoY = parseInt(inimigo.style.top,10)
-    const inimigoX1 = parseInt(inimigo2.style.left,10)
-    const inimigoY1 = parseInt(inimigo2.style.top,10)
-     // essa parte é importante, pois retira as coordenadas diretamente do css, 
-    // o que torna desnecessário realizar a recursão para atualizar
-    // a posição do inimigo!
-    const distanciax1 = blocoX - inimigoX1
-    const distanciay1 = blocoY - inimigoY1
-    const dist1 = Math.sqrt(distanciax1**2 + distanciay1**2) || 1
+    // constantes importantes que consta a velocidade, e a
+    // posição atual do player e do inimigo!
+    const distanciax = PlayerX - inimigoX
+    const distanciay = PlayerY - inimigoY
+    const dist = Math.sqrt(distanciax**2 + distanciay**2) || 1
+    // calculo do vetor (matemático) da distância entre o player e
+    // o inimigo!
+    if(dist < 50){
+        return criarGameOver(gameoverInicial)
+        // caso o vetor distância seja menor que 50, consta que o 
+        // player foi pego e para a movimentação!
+  } 
+  else{
+    return {
+      x: inimigoX + (distanciax/dist) * velocidade,
+      y: inimigoY + (distanciay/dist) * velocidade
+    }
+    // caso não, retorna uma nova coordenada 
+    // onde a posição atual é somada a multiplicação 
+    // do vetor normalizado com a velocidade do inimigo!
+  }
+}
+const moverInimigo2 = (player,inimigo) =>{
+    // essa função acaba sendo igual a função anterior
+    // mas com velocidades diferentes, o que é importante
+    // pois caso não os inimigos depois de um tempo acabam se 
+    // fundindo!
+    const velocidade = 5
+    const blocoX = parseInt(player.style.left,10)
+    const blocoY = parseInt(player.style.top,10)
+    const inimigoX = parseInt(inimigo.style.left,10)
+    const inimigoY = parseInt(inimigo.style.top,10)
     const distanciax = blocoX - inimigoX
     const distanciay = blocoY - inimigoY
     const dist = Math.sqrt(distanciax**2 + distanciay**2) || 1
-    // calculo de distância importante para mexer a entidade!
-    // o ou 1 é importante para impedir divisião por 0  
-    if(dist < 50 || dist1 < 50) {
-        const pegou = criarGameOver(gameoverInicial)
-    // calcula se o inimigo esta proximo o suficiente
-    // para te "pegar"
-  }
 
-    else{
-        const novo = {
-        x: inimigoX + (distanciax/dist) * passo,
-        y: inimigoY + (distanciay/dist) * passo
-        }
-        // caso não, movimenta as coordenadas do inimigo
-    inimigo.style.left = novo.x + "px"
-    inimigo.style.top  = novo.y + "px"
-    // passa as novas coordenadas pro CSS
-    const novo2 = {
-        x: inimigoX1 + (distanciax1/dist1) * 4.5,
-        y: inimigoY1 + (distanciay1/dist1) * 4.5
-    }
-    inimigo2.style.left = novo2.x + "px"
-    inimigo2.style.top  = novo2.y + "px"
-    // faz a mesma coisa, mas pro outro inimigo
-    setTimeout(() => moverInimigo(inimigo, inimigo2), 32)
-    // set time out, feito para rodar a função a cada 32 milisegundos
-  
+    if(dist < 50){
+        return criarGameOver(gameoverInicial)
   } 
+  else{
+    return {
+      x: inimigoX + (distanciax/dist) * velocidade,
+      y: inimigoY + (distanciay/dist) * velocidade
+    }
+  }
 }
-
+const render = (player,inimigo1,inimigo2) =>{
+  const novo1 = moverInimigo(player,inimigo1)
+  const novo2 = moverInimigo2(player,inimigo2)
+  inimigo1.style.left = novo1.x + 'px'
+  inimigo1.style.top = novo1.y + 'px'
+  inimigo2.style.left = novo2.x + 'px'
+  inimigo2.style.top = novo2.y + 'px'
+  setTimeout(() => render(player,inimigo1, inimigo2), 32)
+  // função impura que mexe no DOM para renderizar cada inimigo
+  // pegando as coordenadas que saem de cada função e passam
+  // para o CSS
+}
+const renderPersonagem = (estado) =>{
+  bloco.style.left = estado.x + 'px'
+  bloco.style.top = estado.y + 'px'
+  // função que mexe no DOM e renderiza o player
+}
+const FunçãoAuxiliarColeta = (listaQualquer) =>{
+  return listaQualquer.map((x) => x.style.display = 'none')
+}
+const FunçãoAuxiliarColeta2 = (x) =>{
+  return x.style.display = 'block'
+}
+const FunçãoAuxiliarColeta3 = (x) =>{
+  return x.style.display = 'none'
+}
+FunçãoAuxiliarColeta(EntidadesBroches)
+const ColetaDeBroches = (estadosBroches, ElementosBroches) =>{
+  if(estadosBroches.length === 0){
+    const GameWon = criarGameOver(gameoverInicial)
+    return
+}
+// como acaba sendo aplicado em um processo
+// recursivo, precisa do caso base, que no caso
+// é quando todos os broches são coletados
+  const BlocoX = parseInt(bloco.style.left,10)
+  const BlocoY = parseInt(bloco.style.top,10)
+  const CoordenadasBrocheAtual = estadosBroches[0]
+  const EntidadeBrocheAtual = ElementosBroches[0]
+  FunçãoAuxiliarColeta2(EntidadeBrocheAtual)
+  const filtro = ElementosBroches.filter((broche) => broche !== EntidadeBrocheAtual)
+  FunçãoAuxiliarColeta(filtro)
+  const distanciax = CoordenadasBrocheAtual.x - BlocoX
+  const distanciay = CoordenadasBrocheAtual.y - BlocoY
+  const dist = Math.sqrt(distanciax**2 + distanciay**2)
+  if(dist < 50){
+    FunçãoAuxiliarColeta3(EntidadeBrocheAtual)
+    return true
+  }
+  else{
+    return false
+  }
+}
 const colisao = (obstaculo, player) => {
     if (player.x < obstaculo.x + obstaculo.width &&
     player.x + player.width > obstaculo.x &&
@@ -336,7 +365,6 @@ const colisao = (obstaculo, player) => {
         return false
     }
 // função de colisão do tipo AABB clássica!
-
 }
 // função de start do jogo, que ve o addEventListener para o Enter
 // e inicia as duas funções de start do jogo, o loop e o moverInimigo
@@ -344,15 +372,16 @@ const FuncaoStart = () =>{
   const CriarTela = criarTelaInicial(gameoverInicial)
   document.addEventListener('keydown',(e) =>{
     if(e.key === 'Enter'){
-        CriarTela.style.display = "none"
-        loop(EstadoInicial, broches,EntidadesBroches)
-        moverInimigo(InimigoOficial,inim2)
+        FunçãoAuxiliarColeta3(CriarTela)
+        MoverPersonagem(EstadoInicial,broches,EntidadesBroches)
+        render(bloco,InimigoOficial,inim2)
       }
     },{once: true})
 }
 FuncaoStart()
 
-
+// VOU RECOMENTAR COM MAIS AFINCO QUANDO PUDER, tenho que terminar os comentarios ainda,
+// mas agora eu to atrasado!!!!!
 
 </script>
 </body>
