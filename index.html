@@ -249,8 +249,10 @@ const personagens = {
    goodways: {nome: 'Good Ways', avatar: 'assets/goodways.png'},
    kalelfreira: {nome: 'Kal-El Freira', avatar: 'assets/kal-elfeliz.png'},
    kalelfreirabravo: {nome: 'Kal-El Freira', avatar: 'assets/kal-elbravo.png'},
+   kalelfreiratriste: {nome: 'Kal-El Freira', avatar: 'assets/kal-eltriste.png'},
    bigc: {nome: 'Big C', avatar: 'assets/bigcarlos-triste.png'},
-   nobody: {nome: 'nobody', avatar: 'assets/nobody.png'}
+   nobody: {nome: 'nobody', avatar: 'assets/nobody.png'},
+   normas: {nome: 'Runas Nôrmicas', avatar: 'assets/qr-code.png'}
 }
 
 //Aqui criamos outra lista que contém as cenas. Elas detalham o personagem pelo id da lista anterior (puxa o avatar e o nome do personagem)
@@ -372,7 +374,68 @@ vamospraolabirinto: {
     cenario: 'assets/ufs_reitoria.jpg',
     dialogo: 'Não se engane, jovem! Você verá que esse desafio não é um mero jogo, se errar você será JUBILADO!',
     opcoes: [
-      {opcao: 1, texto: 'A. Tá, vamo lá...' , proximaCena: 'kaleldaumaviso'}
+      {opcao: 1, texto: 'A. Tá, vamo lá...' , proximaCena: 'pergunta1'}
+    ]
+  },
+
+  pergunta1: {
+    personagem: 'kalelfreira',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Vamos lá: qual a regra da toalha, segundo o livro "O Guia do Mochileiro das Galáxias" de Douglas Adams?',
+    opcoes: [
+      {opcao: 1, texto: 'A. A toalha é o item mais valioso do mochileiro interestelar, pois serve como agasalho, arma, proteção e, claro, para se secar.' , proximaCena: 'pergunta2'},
+      {opcao: 2, texto: 'B. A regra da toalha diz que só se pode usar a toalha em planetas que tenham atmosfera com exatamente 21% de oxigênio.', proximaCena: 'telaerouu'},
+      {opcao: 3, texto: 'C. A regra da toalha determina que ela deve ser sempre colorida de azul para que proteja contra radiação cósmica.', proximaCena: 'telaerouu'},
+    ]
+  },
+
+  pergunta2: {
+    personagem: 'kalelfreira',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Aí sim! Agora para próxima: Um professor pode colocar uma arma na mesa e ameaçar a turma por um aluno ter colado?',
+    opcoes: [
+      {opcao: 1, texto: 'A. Claro que sim! As normas devem dizer que medidas cabíveis podem ser tomadas.', proximaCena: 'telaerouu'},
+      {opcao: 2, texto: 'B. É possível. Até porque o regimento da universade deve ser diferente da lei fora dela', proximaCena: 'telaerouu'},
+      {opcao: 3, texto: 'C. Claro que não. Independente de normas, é crime ameaçar as pessoas com arma de fogo.' , proximaCena: 'pergunta3'}
+    ]
+  },
+
+  pergunta3: {
+    personagem: 'kalelfreira',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Ufa! Pensei que iria errar. Agora a última e mais fácil: qual a derivada de (sen(x))^2?',
+    opcoes: [
+      {opcao: 1, texto: 'A. 2 sen(x)', proximaCena: 'telaerouu'},
+      {opcao: 2, texto: 'B. 2sen(x)cos(x)', proximaCena: 'venceuquiz'},
+      {opcao: 3, texto: 'C. -2sen(x)cos(x)' , proximaCena: 'telaerouu'}
+    ]
+  },
+
+  telaerouu: {
+    personagem: 'kalelfreiratriste',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Você foi jubilado! Não poderá conhecer as normas, mas pode tentar de novo ou escolher outra rota:',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Reiniciar)', proximaCena: 'pergunta1'},
+      {opcao: 2, texto: 'B. (Escolher outra rota)', proximaCena: 'escolhaderotas'}
+    ]
+  },
+
+  venceuquiz:{
+    personagem: 'kalelfreira',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Você foi conseguiu. Agora entre pela porta para ter acesso as runas nôrmicas:',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Entrar na porta)', proximaCena: 'normasachivment'}
+    ]
+  },
+
+  normasachivment: {
+    personagem: 'normas',
+    cenario: 'assets/ufs_reitoria.jpg',
+    dialogo: 'Escaneie essa runa para ter acesso as normas:',
+    opcoes: [
+      {opcao: 1, texto: 'A. (Escolher outra rota)', proximaCena: 'escolhaderotas'}
     ]
   },
 
