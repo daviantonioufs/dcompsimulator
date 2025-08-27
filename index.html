@@ -560,11 +560,8 @@ const limparArena = () => {
 
 const StartMinigame = () =>{ 
   
-  // função de criação da arena, pega o elemento pelo ID do css e cola diretamente.
-const arena = document.getElementById("arena") 
-
+// função de criação da arena, pega o elemento pelo ID do css e cola diretamente, além de limpa-lá
 limparArena()
-
 // função de criação da entidade obstaculo!
 const gerarObs = (pos) => {
     const o = document.createElement("div")
@@ -575,7 +572,6 @@ const gerarObs = (pos) => {
     return o
 
 }
-
 const criarBloco = (pos) => {
     const b = document.createElement("div")
     b.className = "bloco"
@@ -584,7 +580,7 @@ const criarBloco = (pos) => {
     arena.appendChild(b)
     return b
 // processo de criação das entidades, onde cada elemento tem seu ID do css e posição baseado nos registros localizados abaixo desse bloco de funções.
-}
+};
 const criarInimigo = (pos) => {
     const b = document.createElement("div")
     b.className = "inimigo"
@@ -595,7 +591,7 @@ const criarInimigo = (pos) => {
     
 }
 const criarGameOver = (pos) => {
-    const b = document.createElement("div");
+    const b = document.createElement("div")
     b.className = "gameover"
     b.style.left = pos.x + "px"
     b.style.top  = pos.y + "px"
@@ -644,9 +640,9 @@ const inimigoInicial = {x:100, y: 20}
 // bloco de criação ativa das entidades, pegando as funções e aplicando a posição como parametro.
 const InimigoOficial = criarInimigo(inimigoInicial)
 const bloco = criarBloco(EstadoInicial)
-const estados = [EstadoObst1, EstadoObst2, EstadoObst3, EstadoObst4, EstadoObst5, EstadoObst6, EstadoObst7, EstadoObst8]
+const estados = [EstadoObst1, EstadoObst2, EstadoObst3, EstadoObst4, EstadoObst5, EstadoObst6, EstadoObst7, EstadoObst8];
 // map que gera todos os obstaculos presentes no array estados
-const obstaculos = estados.map(estado => gerarObs(estado))
+const obstaculos = estados.map(estado => gerarObs(estado));
 const inim2 = criarInimigo(ini2)
 // função de movimentação, que calcula a posição baseado no addEventListener que virá a seguir!
 const mover = (estado, tecla) => {
@@ -659,7 +655,7 @@ const mover = (estado, tecla) => {
         y: tecla === 'ArrowUp'    ? estado.y - passo : tecla === 'ArrowDown' ? estado.y + passo : estado.y,
         width: estado.width,
         height: estado.height
-    }
+    };
     // registro que guarda a nova posição baseado no addEventlistener!
     const TestarColisão = estados.map((obs) => colisao(obs,novo))
     const filtro = TestarColisão.filter((obs) => obs === true)
@@ -677,123 +673,180 @@ const mover = (estado, tecla) => {
         width: estado.width,
         height: estado.height
       }
-    // bloco de função que testa colisão com a entidade obstáculo, como a função colisão foi feita após a movimentação
-    // ela é chamada antes mesmo de ser definida, sendo só feita no final do código.
+    // caso não exista colisão com o obstaculo, testa a colisão com a arena
+    // e retorna ou a nova movimentação, ou o maximo da arena!
   }
 }
   const broches = [
-  { x: 750, y: 100 },
+  { x: 50, y: 50 },
+  { x: 150, y: 100 },
+  { x: 250, y: 200 },
+  { x: 100, y: 400 },
+  { x: 300, y: 200 },
+  { x: 600, y: 100 },
+  { x: 800, y: 250 },
+  { x: 1000, y: 300 },
+  { x: 1250, y: 400 },
+  { x: 200, y: 500 },
+  { x: 350, y: 50 },
   { x: 950, y: 250 },
   { x: 1150, y: 300 }
 ]
 // lista de posição dos broches que vão ser coletados!
 
 const EntidadesBroches = broches.map((broche) => criarBroche(broche))
-const loop = (estado, brocheAt,EntBroches) => {
-  if (brocheAt.length === 0) {
+// map que cria cada broche como entidade baseado na função CriarBroche
+// baseado em cada registro do array broches.
+const MoverPersonagem = (estado,broches,EntBroches) => {
+  document.addEventListener('keydown', (e) => {
+  // Escutador de eventos que mapeia qual tecla esta sendo pressionada!
+      const novo = mover(estado, e.key)
+      // nova constante que aplica a função mover
+      // ao estado atual, tendo como paramêtro a tecla pressionada
+      renderPersonagem(novo)
+      // aplica a função impura que mexe no DOM 
+      // e pinta o bloco na nova posição no CSS
+      if(ColetaDeBroches(novo,broches,EntBroches) === true){
+        MoverPersonagem(novo,broches.slice(1),EntBroches.slice(1))
+      }
+      // implementação recursiva que chama a função Coleta de Broches
+      // caso o personagem toque o broche, aplica a função para a proxima
+      // posição do array.
+      else{
+        MoverPersonagem(novo,broches,EntBroches)
+        // caso não, mantém o broche atual!
+      }
+  }, {once:true}) // aplicação do AddEventListener que apaga o listener após o evento ser ativado
+  // porém, por estar em um processo recursivo, o Listener retorna, isso impede que entre em um processo 
+  // de recursão infinita e trave o navegador!
+}
+// função que movimenta o primeiro inimigo!
+const moverInimigo = (player,inimigo) =>{
+    const velocidade = 3
+    const PlayerX = parseInt(player.style.left,10)
+    const PlayerY = parseInt(player.style.top,10)
+    const inimigoX = parseInt(inimigo.style.left,10)
+    const inimigoY = parseInt(inimigo.style.top,10)
+    // constantes importantes que consta a velocidade, e a
+    // posição atual do player e do inimigo!
+    const distanciax = PlayerX - inimigoX
+    const distanciay = PlayerY - inimigoY
+    const dist = Math.sqrt(distanciax**2 + distanciay**2) || 1
+    // calculo do vetor (matemático) da distância entre o player e
+    // o inimigo!
+    if(dist < 50){
+        const pegou = renderizarCena("perdeuminigame")
+        
+        // caso o vetor distância seja menor que 50, consta que o 
+     // player foi pego e para a movimentação!
+     } 
+   else{
+     return {
+      x: inimigoX + (distanciax/dist) * velocidade,
+      y: inimigoY + (distanciay/dist) * velocidade
+    }
+    // caso não, retorna uma nova coordenada 
+    // onde a posição atual é somada a multiplicação 
+    // do vetor normalizado com a velocidade do inimigo!
+  }
+}
+const moverInimigo2 = (player,inimigo) =>{
+    // essa função acaba sendo igual a função anterior
+    // mas com velocidades diferentes, o que é importante
+    // pois caso não os inimigos depois de um tempo acabam se 
+    // fundindo!
+    const velocidade = 5
+    const blocoX = parseInt(player.style.left,10)
+    const blocoY = parseInt(player.style.top,10)
+    const inimigoX = parseInt(inimigo.style.left,10)
+    const inimigoY = parseInt(inimigo.style.top,10)
+    const distanciax = blocoX - inimigoX
+    const distanciay = blocoY - inimigoY
+    const dist = Math.sqrt(distanciax**2 + distanciay**2) || 1
+
+    if(dist < 50){
+        const pegou = renderizarCena("perdeuminigame")
+  } 
+  else{
+    return {
+      x: inimigoX + (distanciax/dist) * velocidade,
+      y: inimigoY + (distanciay/dist) * velocidade
+    }
+  }
+}
+const render = (player,inimigo1,inimigo2) =>{
+  const novo1 = moverInimigo(player,inimigo1)
+  const novo2 = moverInimigo2(player,inimigo2)
+  inimigo1.style.left = novo1.x + 'px'
+  inimigo1.style.top = novo1.y + 'px'
+  inimigo2.style.left = novo2.x + 'px'
+  inimigo2.style.top = novo2.y + 'px'
+  inimigo1.timeout = setTimeout(() => render(player,inimigo1, inimigo2), 32)
+  inimigo2.timeout = inimigo1.timeout
+  // função impura que mexe no DOM para renderizar cada inimigo
+  // pegando as coordenadas que saem de cada função e passam
+  // para o CSS
+  // set time out permite que a posição do inimigo seja atualizada baseada no tempo determinado, nese caso o inimigo 2 acaba sendo referenciado com o primeiro
+}
+const renderPersonagem = (estado) =>{
+  bloco.style.left = estado.x + "px"
+  bloco.style.top = estado.y + "px"
+  // função que mexe no DOM e renderiza o player
+}
+const FunçãoAuxiliarColeta = (listaQualquer) =>{
+  return listaQualquer.map((x) => x.style.display = "none")
+}
+// função auxiliar que desliga a imagem de uma lista de elementos!
+const FunçãoAuxiliarColeta2 = (x) =>{
+  return x.style.display = "block"
+}
+// função auxiliar que liga a imagem de algum elemento!
+const FunçãoAuxiliarColeta3 = (x) =>{
+  return x.style.display = "none"
+}
+// função auxiliar que desliga a imagem de algum elemento!
+FunçãoAuxiliarColeta(EntidadesBroches)
+const ColetaDeBroches = (estado,estadosBroches, ElementosBroches) =>{
+  if(estadosBroches.length === 0){
     clearTimeout(InimigoOficial.timeout)
     clearTimeout(inim2.timeout)
     renderizarCena("ganhouminigame")
     return
-  }
-  // na ideia recursiva, calcula a quantidade broches restantes
-  // a recursão é melhor mostrada um pouco baixo
-  const brocheAtual = brocheAt[0]
-  // consta as coordenadas do broche atual
-  const BrocheEntidadeAtual = EntBroches[0]
-  // consta a entidade do broche atual, é importante para retirar e mostrar no CSS
-  const filtro = EntBroches.filter((broche) => broche !== BrocheEntidadeAtual)
-  // filtra todos os broches para além do broche atual!
-  const displayDesligado = filtro.map((broche) => broche.style.display = "none")
-  // desliga todos os broches que não são o atual no CSS
-  BrocheEntidadeAtual.style.display = "block"
-  // liga o display do broche atual
-
-
-// função que ativamente move o personagem baseado nas coordenadas definidas
-// pela função mover!
-  document.addEventListener('keydown', (e) => {
-    const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft']
-    if (teclas.includes(e.key)) {
-      const novo = mover(estado, e.key)
-      const distanciaxb = novo.x - brocheAtual.x
-      const distanciayb = novo.y - brocheAtual.y
-      const distb = Math.sqrt(distanciaxb **2 + distanciayb ** 2)
-      // calculo de distância entre o player e o broche
-      bloco.style.left = novo.x + "px"
-      bloco.style.top = novo.y + "px"
-
-      if (distb < 50) {
-        BrocheEntidadeAtual.style.display = "none"
-        loop(novo, brocheAt.slice(1),EntBroches.slice(1)) 
-        // após concluir que o player chegou perto suficiente
-        // do broche, reinicia a recursão, agora com os próximos
-        // broches
-      } else {
-        loop(novo,brocheAt,EntBroches)
-      }
-      // caso não reinicia a recursão com os mesmos broches
-    }
-    else{
-      loop(estado,brocheAt,EntBroches)
-      // caso não se mova, reinicia a recursão com os mesmos broches 
-      // e mesma posição
-    }
-  },{once:true});
-  // processo que permite que a recursão não seja 
-  // gerada infinitamente, já que o once true apaga o listener após 
-  // ele ser efetuado, mas como esta em um processo recursivo, 
-  // ele reinicia, o que impede que dê stack overflow. 
-};
-// função que realiza o movimento do inimigo!
-const moverInimigo = (inimigo, inimigo2) =>{
-    const passo = 3
-    const blocoX = parseInt(bloco.style.left,10)
-    const blocoY = parseInt(bloco.style.top,10)
-    const inimigoX = parseInt(inimigo.style.left,10)
-    const inimigoY = parseInt(inimigo.style.top,10)
-    const inimigoX1 = parseInt(inimigo2.style.left,10)
-    const inimigoY1 = parseInt(inimigo2.style.top,10)
-     // essa parte é importante, pois retira as coordenadas diretamente do css, 
-    // o que torna desnecessário realizar a recursão para atualizar
-    // a posição do inimigo!
-    const distanciax1 = blocoX - inimigoX1
-    const distanciay1 = blocoY - inimigoY1
-    const dist1 = Math.sqrt(distanciax1**2 + distanciay1**2) || 1
-    const distanciax = blocoX - inimigoX
-    const distanciay = blocoY - inimigoY
-    const dist = Math.sqrt(distanciax**2 + distanciay**2) || 1
-    // calculo de distância importante para mexer a entidade!
-    // o ou 1 é importante para impedir divisião por 0  
-    if(dist < 50 || dist1 < 50) {
-        const pegou = renderizarCena("perdeuminigame")
-    // calcula se o inimigo esta proximo o suficiente
-    // para te "pegar"
-  }
-
-    else{
-        const novo = {
-        x: inimigoX + (distanciax/dist) * 4.5,
-        y: inimigoY + (distanciay/dist) * 4.5
-        }
-        // caso não, movimenta as coordenadas do inimigo
-    inimigo.style.left = novo.x + "px"
-    inimigo.style.top  = novo.y + "px"
-    // passa as novas coordenadas pro CSS
-    const novo2 = {
-        x: inimigoX1 + (distanciax1/dist1) * 3,
-        y: inimigoY1 + (distanciay1/dist1) * 3
-    }
-    inimigo2.style.left = novo2.x + "px"
-    inimigo2.style.top  = novo2.y + "px"
-    // faz a mesma coisa, mas pro outro inimigo
-    inimigo.timeout = setTimeout(() => moverInimigo(inimigo, inimigo2), 32)
-    inimigo2.timeout = inimigo.timeout
-    // set time out, feito para rodar a função a cada 32 milisegundos
-  
-  } 
 }
+// como acaba sendo aplicado em um processo
+// recursivo, precisa do caso base, que no caso
+// é quando todos os broches são coletado
+//nesse caso quando chega a 0, o settime out é apagado o que evita um bug de perder mesmo ao ganhar, em suma faz os inimigos 
+// pararem depois que todos os broches são coletado, então o jogo não é de fato terminado. apenas o sistema de movimentação para de ser chamado a cada 32 ms
 
+  const CoordenadasBrocheAtual = estadosBroches[0]
+  const EntidadeBrocheAtual = ElementosBroches[0]
+// só constantes necessárias para acessar o broche específico!
+
+  FunçãoAuxiliarColeta2(EntidadeBrocheAtual)
+  // liga o display do broche atual, é importante no processo recursivo
+  // por que o que virá abaixo vai desligar o display, então acabava que 
+  // apartir do primeiro todos ficavam desligados, o que não era a ideia.
+
+  const filtro = ElementosBroches.filter((broche) => broche !== EntidadeBrocheAtual)
+  FunçãoAuxiliarColeta(filtro)
+  // desliga todos os displays que não são o broche atual
+  
+  const distanciax = CoordenadasBrocheAtual.x - estado.x
+  const distanciay = CoordenadasBrocheAtual.y - estado.y
+  const dist = Math.sqrt(distanciax**2 + distanciay**2)
+  // calculo de vetor distância do mesmo jeito dos inimigos
+  // mas só calcula a distância mesmo
+  if(dist < 50){
+    FunçãoAuxiliarColeta3(EntidadeBrocheAtual)
+    return true
+  }
+  else{
+    return false
+  }
+  // retorna true ou false que é trabalhado la na função
+  // mover personagem!
+}
 const colisao = (obstaculo, player) => {
     if (player.x < obstaculo.x + obstaculo.width &&
     player.x + player.width > obstaculo.x &&
@@ -804,28 +857,32 @@ const colisao = (obstaculo, player) => {
     else{
         return false
     }
-// função de colisão do tipo AABB clássica!
-
+// função de colisão do tipo AABB clássica! baseado no tutorial
+// disponível em: https://tutorialedge.net/gamedev/aabb-collision-detection-tutorial/
 }
 // função de start do jogo, que ve o addEventListener para o Enter
 // e inicia as duas funções de start do jogo, o loop e o moverInimigo
-const FuncaoStart3 = () =>{
-  const CriarTela = criarTelaInicial(gameoverInicial)
+const CriarTela = criarTelaInicial(gameoverInicial)
+const FuncaoStart = () =>{
   document.addEventListener('keydown',(e) =>{
     if(e.key === 'Enter'){
-        CriarTela.style.display = "none"
-        loop(EstadoInicial, broches,EntidadesBroches)
-        moverInimigo(InimigoOficial,inim2)
+        FunçãoAuxiliarColeta3(CriarTela)
+        MoverPersonagem(EstadoInicial,broches,EntidadesBroches)
+        render(bloco,InimigoOficial,inim2)
+      }
+      else{
+        FuncaoStart()
       }
     },{once: true})
 }
-FuncaoStart3()
+// Função de Start do jogo, que liga as funções necessárias
+// para iniciar o jogo após o evento 'Enter'.
+FuncaoStart()
 }
 
-const StartLabirinto = () =>{
+const StartLabirinto = () => {
 
 limparArena()
-
 const arena = document.getElementById("arena") // Seleciona a arena do jogo
 
 // Função que cria o bloco do jogador baseado no id 'bloco' e suas dimensões definido nos estilos
@@ -850,7 +907,7 @@ const criarBroche = (pos) => {
 
 // Estados iniciais do broche e jogador (do labirinto está em outro arquivo) 
 const EstadoInicial = {x: 50, y: 350, width: 20, height: 20}
-const BrocheInicial = {x: 1220, y:160}
+const BrocheInicial = {x: 1140, y: 325}
 const gameoverInicial = {x: 0 , y: 0}
 
 // Criação dos elementos iniciais baseados na função e o argumento da posição
@@ -861,7 +918,7 @@ const broche = criarBroche(BrocheInicial)
 // itera toda lista aplicando a posição de cada registro para gerer um bloco (baseado no estilo do css) e adicionar a arena
 labirinto.forEach(pos => {
     const o = document.createElement("div");
-    o.className = "obst2";
+    o.className = "obst";
     o.style.left = pos.x + "px"
     o.style.top  = pos.y + "px"
     arena.appendChild(o) // obstaculos são adicionados
@@ -903,50 +960,41 @@ const mover = (estado, tecla) => {
         return novo2
     }
 }
+const RenderPersonagem2 = (player,estado) =>{
+    player.style.left = estado.x + 'px'
+    player.style.top = estado.y + 'px'
+}
+// renderiza o player
 
 // loop principal para ler as teclas e atualizar posição
 // ativamente move o personagem baseado nas coordenadas definidas pela função mover
-const loop = (estado) => {
-
+const MoverPersonagem = (player,estado) => {
     document.addEventListener('keydown', (e) => {
-        const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft'];
-        if (teclas.includes(e.key)) {
-            const novo = mover(estado, e.key)
-            // observa se a tecla esta inclusa no lista definida e em caso afimativo chama a função de movimentação definida acima
-            const blocoX = parseInt(bloco.style.left,10)// converte as as cordenadas do personagem, definida em px, para inteiro na
-            const blocoY = parseInt(bloco.style.top,10) // converte as as cordenadas do personagem, definida em px, para inteiro na base 10
-            const brochex = parseInt(BrocheInicial.x)
-            const brochey = parseInt(BrocheInicial.y)// a mesma ideia pro do personagem
-            const distanciaxb = blocoX - brochex
-            const distanciayb = blocoY - brochey
-            const distb = Math.sqrt(distanciaxb**2 + distanciayb**2)
-            // caucula a distancia entre broche e personagem (distancia entyre dois pontos)
-            if(distb < 22){
-              const destino = renderizarCena('ganhoulabirinto')
-              
-                // se a distancia for menosr que 22 px o jogo é finalizado e vencido    
-            }
-            else{
-                // caso nao tenha a distancia correta o jogo retorna o loop de movimento com o novo estado
-                bloco.style.left = novo.x + "px"
-                bloco.style.top  = novo.y + "px"
-                loop(novo)
-            }
-        }
-        else{
-            // Se tecla não estiver na lista continua o loop sem mover, retornando o mesmo estado
-            loop(estado)
-        }
-
-    },{once: true}); // Garante que o evento seja escutado uma vez por ciclo
-}// processo que permite que a recursão não seja 
-  // gerada infinitamente, já que o once true apaga o listener após 
-  // ele ser efetuado, mas como esta em um processo recursivo, 
-  // ele reinicia, o que impede que dê stack overflow. 
+      const novo = mover(estado, e.key)
+      // aplica a função mover baseado na tecla!
+      const distanciaxb = novo.x - BrocheInicial.x
+      const distanciayb = novo.y - BrocheInicial.y
+     const distb = Math.sqrt(distanciaxb**2 + distanciayb**2)
+      // calculo de distância entre o broche e o estado atual
+      if(distb < 22){
+        // calcula se o player ta perto o suficiente para constar
+        // se o broche pode ser coletado
+        const destino = renderizarCena('ganhoulabirinto')
+        return
+      }
+      else{
+        RenderPersonagem2(player,novo)
+        // caso não, renderiza o player na nova posição, baseado na
+        // função render
+        MoverPersonagem(player,novo)
+        // reinicia a recursão com a nova posição como parâmetro
+      }
+    },{once: true}) // conjectura que apaga o listener após ser usado
+} // mas como esta em uma recursão o listener é reativado, esse once: true,
+// permite que os listeners não sejam empilhados, fazendo com que o navegador 
+// não trave!
 
 
-// Função que verifica colisão entre jogador e obstáculo
-// colisão do tipo AABB clássica
 const colisao = (obstaculo, player) => {
     if (player.x < obstaculo.x + obstaculo.width &&
     player.x + player.width > obstaculo.x &&
@@ -958,14 +1006,11 @@ const colisao = (obstaculo, player) => {
         return false
     }
 }
+// o mesmo sistema de colisão anterior, baseado no tutorial
+// disponivel em: https://tutorialedge.net/gamedev/aabb-collision-detection-tutorial/
 
 // Inicia o jogo com estado inicial definido
-loop(EstadoInicial)
-
+MoverPersonagem(bloco,EstadoInicial)
 }
-
-
-
-
 </script>
 </html>
