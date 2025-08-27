@@ -679,18 +679,16 @@ const mover = (estado, tecla) => {
 }
   const broches = [
   { x: 50, y: 50 },
-  { x: 150, y: 100 },
+ { x: 1150, y: 300 },
   { x: 250, y: 200 },
   { x: 100, y: 400 },
   { x: 300, y: 200 },
   { x: 600, y: 100 },
-  { x: 800, y: 250 },
-  { x: 1000, y: 300 },
   { x: 1250, y: 400 },
   { x: 200, y: 500 },
+  { x: 800, y: 250 },
   { x: 350, y: 50 },
   { x: 950, y: 250 },
-  { x: 1150, y: 300 }
 ]
 // lista de posição dos broches que vão ser coletados!
 
@@ -880,6 +878,7 @@ const FuncaoStart = () =>{
 FuncaoStart()
 }
 
+    
 const StartLabirinto = () => {
 
 limparArena()
@@ -915,10 +914,10 @@ const bloco = criarBloco(EstadoInicial)
 const broche = criarBroche(BrocheInicial)
 
 // Criação dos obstáculos definidos no arquivo labirinto.js lá no script html
-// itera toda lista aplicando a posição de cada registro para gerer um bloco (baseado no estilo do css) e adicionar a arena
+// itera toda lista aplicando a posição de cada registro para gerer um bloco (baseado no estilo do css) e adiciona a arena
 labirinto.forEach(pos => {
     const o = document.createElement("div");
-    o.className = "obst";
+    o.className = "obst2";
     o.style.left = pos.x + "px"
     o.style.top  = pos.y + "px"
     arena.appendChild(o) // obstaculos são adicionados
@@ -1014,3 +1013,4 @@ MoverPersonagem(bloco,EstadoInicial)
 }
 </script>
 </html>
+
