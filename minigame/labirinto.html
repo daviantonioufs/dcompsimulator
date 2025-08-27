@@ -139,49 +139,40 @@ const mover = (estado, tecla) => {
         return novo2
     }
 }
+const RenderPersonagem2 = (player,estado) =>{
+    player.style.left = estado.x + 'px'
+    player.style.top = estado.y + 'px'
+}
+// renderiza o player
 
 // loop principal para ler as teclas e atualizar posição
 // ativamente move o personagem baseado nas coordenadas definidas pela função mover
-const loop = (estado) => {
-
+const MoverPersonagem = (player,estado) => {
     document.addEventListener('keydown', (e) => {
-        const teclas = ['ArrowRight','ArrowDown','ArrowUp','ArrowLeft'];
-        if (teclas.includes(e.key)) {
-            const novo = mover(estado, e.key)
-            // observa se a tecla esta inclusa no lista definida e em caso afimativo chama a função de movimentação definida acima
-            const blocoX = parseInt(bloco.style.left,10)// converte as as cordenadas do personagem, definida em px, para inteiro na
-            const blocoY = parseInt(bloco.style.top,10) // converte as as cordenadas do personagem, definida em px, para inteiro na base 10
-            const brochex = parseInt(BrocheInicial.x)
-            const brochey = parseInt(BrocheInicial.y)// a mesma ideia pro do personagem
-            const distanciaxb = blocoX - brochex
-            const distanciayb = blocoY - brochey
-            const distb = Math.sqrt(distanciaxb**2 + distanciayb**2)
-            // caucula a distancia entre broche e personagem (distancia entyre dois pontos)
-            if(distb < 22){
-                // se a distancia for menosr que 22 px o jogo é finalizado e vencido
-                
-            }
-            else{
-                // caso nao tenha a distancia correta o jogo retorna o loop de movimento com o novo estado
-                bloco.style.left = novo.x + "px"
-                bloco.style.top  = novo.y + "px"
-                loop(novo)
-            }
-        }
-        else{
-            // Se tecla não estiver na lista continua o loop sem mover, retornando o mesmo estado
-            loop(estado)
-        }
-
-    },{once: true}); // Garante que o evento seja escutado uma vez por ciclo
-}// processo que permite que a recursão não seja 
-  // gerada infinitamente, já que o once true apaga o listener após 
-  // ele ser efetuado, mas como esta em um processo recursivo, 
-  // ele reinicia, o que impede que dê stack overflow. 
+      const novo = mover(estado, e.key)
+      // aplica a função mover baseado na tecla!
+      const distanciaxb = novo.x - BrocheInicial.x
+      const distanciayb = novo.y - BrocheInicial.y
+     const distb = Math.sqrt(distanciaxb**2 + distanciayb**2)
+      // calculo de distância entre o broche e o estado atual
+      if(distb < 22){
+        // calcula se o player ta perto o suficiente para constar
+        // se o broche pode ser coletado
+        return
+      }
+      else{
+        RenderPersonagem2(player,novo)
+        // caso não, renderiza o player na nova posição, baseado na
+        // função render
+        MoverPersonagem(player,novo)
+        // reinicia a recursão com a nova posição como parâmetro
+      }
+    },{once: true}) // conjectura que apaga o listener após ser usado
+} // mas como esta em uma recursão o listener é reativado, esse once: true,
+// permite que os listeners não sejam empilhados, fazendo com que o navegador 
+// não trave!
 
 
-// Função que verifica colisão entre jogador e obstáculo
-// colisão do tipo AABB clássica
 const colisao = (obstaculo, player) => {
     if (player.x < obstaculo.x + obstaculo.width &&
     player.x + player.width > obstaculo.x &&
@@ -193,9 +184,11 @@ const colisao = (obstaculo, player) => {
         return false
     }
 }
+// o mesmo sistema de colisão anterior, baseado no tutorial
+// disponivel em: https://tutorialedge.net/gamedev/aabb-collision-detection-tutorial/
 
 // Inicia o jogo com estado inicial definido
-loop(EstadoInicial)
+MoverPersonagem(bloco,EstadoInicial)
 
 </script>
 </body>
