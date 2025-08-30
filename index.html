@@ -16,6 +16,11 @@ body {
     -webkit-backdrop-filter: blur(10px); /*Aqui colocamos um webkit pra se adaptar para o macOS*/
   }
 
+@font-face {
+  font-family: Arvo;
+  src: url('assets/Arvo-Regular.ttf') format('truetype'); /*font-face adicionado pra manter a fonte padrão do jogo*/
+}
+
 .novel{
         display: block;
         box-shadow: 0 0 5px .1px #181818ba;
@@ -225,7 +230,7 @@ body {
 <body>
   <!--Efeitos sonoros e mais músicas adicionadas para novas instâncias, usamos o comando que busca o id da música e colocamos-->
   <!--a ordem da música que deveria parar e qual deveria tocar. Exemplo do comando: nomedamusica.play()-->
-  <!--O erro da múscia não tocar ao iniciar o jogo será resolvido até o prazo.-->
+  <!--O erro da música foi resolvido.-->
     <audio id="musicaFundo" preload="auto" autoplay loop>
     <source src="assets/musicadefundodojogo.mp3" type="audio/mpeg">
     </audio>
@@ -559,59 +564,62 @@ const carregarCena = (idCena) => {
 // a mais e itens a menos
 const renderizarCena = (cenaId) => {
     if (cenaId === 'minigame') {
-      document.querySelector(".arena").style.display = "block"
-      document.querySelector(".novel").style.display = "none"
-      StartMinigame()
+        document.querySelector(".arena").style.display = "block"
+        document.querySelector(".novel").style.display = "none"
+        StartMinigame()
+    }
+    else if (cenaId === 'labirinto') {
+        document.querySelector(".arena").style.display = "block"
+        document.querySelector(".novel").style.display = "none"
+        musicaFundo.pause()
+        musicaLabirinto.play()
+        musicaLabirinto.loop = true
+        StartLabirinto()
+    }
+    else if (cenaId === 'pergaminho' || cenaId === 'cafe') {
+        musicaFundo.pause()
+        musicaFundo.loop = false
+        itemcolected.play()
+        const base = carregarCena(cenaId)
+        document.querySelector(".arena").style.display = "none"
+        document.querySelector(".novel").style.display = "block"
+        document.querySelector(".faladopersonagem").textContent = base.dialogo
+        document.querySelector(".avatar").src = base.avatar
+        document.querySelector(".cenario").style.backgroundImage = `url(${base.cenario})`
+        document.querySelector(".caixadeescolhas").innerHTML = base.opcoes.reduce((html, escolha) =>
+            html + `<div class="escolha" onclick="renderizarCena('${escolha.proximaCena}')">${escolha.texto}</div>`, "")
+    }
+    else if (cenaId === 'perdeulabirinto') {
+        musicaLabirinto.pause()
+        musicaLabirinto.loop = false
+        gameoverlabirinto.currentTime = 0
+        gameoverlabirinto.play()
+        const base = carregarCena(cenaId)
+        document.querySelector(".arena").style.display = "none"
+        document.querySelector(".novel").style.display = "block"
+        document.querySelector(".faladopersonagem").textContent = base.dialogo
+        document.querySelector(".avatar").src = base.avatar
+        document.querySelector(".cenario").style.backgroundImage = `url(${base.cenario})`
+        document.querySelector(".caixadeescolhas").innerHTML = base.opcoes.reduce((html, escolha) =>
+            html + `<div class="escolha" onclick="renderizarCena('${escolha.proximaCena}')">${escolha.texto}</div>`, "")
+    }
+    else if (cenaId === 'reset') {
+        window.location.reload()
+    }
+    else {
+        musicaFundo.play()
+        musicaFundo.loop = true
+        const base = carregarCena(cenaId)
+        document.querySelector(".arena").style.display = "none"
+        document.querySelector(".novel").style.display = "block"
+        document.querySelector(".faladopersonagem").textContent = base.dialogo
+        document.querySelector(".avatar").src = base.avatar
+        document.querySelector(".cenario").style.backgroundImage = `url(${base.cenario})`
+        document.querySelector(".caixadeescolhas").innerHTML = base.opcoes.reduce((html, escolha) =>
+            html + `<div class="escolha" onclick="renderizarCena('${escolha.proximaCena}')">${escolha.texto}</div>`, "")
+    }
 }
-    if (cenaId === 'labirinto'){
-      document.querySelector(".arena").style.display = "block"
-      document.querySelector(".novel").style.display = "none"
-      StartLabirinto()
-    }
 
-    if (cenaId === 'pergaminho') {
-      musicaFundo.pause()
-      musicaFundo.loop = false
-      itemcolected.play()
-      const base = carregarCena(cenaId)
-      document.querySelector(".arena").style.display = "none"
-      document.querySelector(".novel").style.display = "block"
-      document.querySelector(".faladopersonagem").textContent = base.dialogo
-      document.querySelector(".avatar").src = base.avatar
-      document.querySelector(".cenario").style.backgroundImage = `url(${base.cenario})`
-      document.querySelector(".caixadeescolhas").innerHTML = base.opcoes.reduce((html,escolha) => 
-      html + `<div class="escolha" onclick="renderizarCena('${escolha.proximaCena}')">${escolha.texto}</div>`, "")
-    }
-
-    if (cenaId === 'cafe') {
-      musicaFundo.pause()
-      musicaFundo.loop = false
-      itemcolected.play()
-      const base = carregarCena(cenaId)
-      document.querySelector(".arena").style.display = "none"
-      document.querySelector(".novel").style.display = "block"
-      document.querySelector(".faladopersonagem").textContent = base.dialogo
-      document.querySelector(".avatar").src = base.avatar
-      document.querySelector(".cenario").style.backgroundImage = `url(${base.cenario})`
-      document.querySelector(".caixadeescolhas").innerHTML = base.opcoes.reduce((html,escolha) => 
-      html + `<div class="escolha" onclick="renderizarCena('${escolha.proximaCena}')">${escolha.texto}</div>`, "")
-    }
-
-    else if (cenaId === 'reset'){window.location.reload()}
-
-    else { 
-      const base = carregarCena(cenaId)
-      document.querySelector(".arena").style.display = "none"
-      document.querySelector(".novel").style.display = "block"
-      document.querySelector(".faladopersonagem").textContent = base.dialogo
-      document.querySelector(".avatar").src = base.avatar
-      document.querySelector(".cenario").style.backgroundImage = `url(${base.cenario})`
-      document.querySelector(".caixadeescolhas").innerHTML = base.opcoes.reduce((html,escolha) => 
-      html + `<div class="escolha" onclick="renderizarCena('${escolha.proximaCena}')">${escolha.texto}</div>`, "")
-    }
-
-     
-}
 
 // Aqui definimos qual a primeira cena que aparecerá quando a função renderizarCena 
 // for chamada, que no caso é a início do jogo.
@@ -821,7 +829,6 @@ const moverInimigo = (player,inimigo) =>{
     if(dist < 50){
         musicaMinigame.pause()
         musicaMinigame.loop = false
-        musicaFundo.play()
         const pegou = renderizarCena("perdeuminigame")
         // caso o vetor distância seja menor que 50, consta que o 
      // player foi pego e para a movimentação!
@@ -853,7 +860,6 @@ const moverInimigo2 = (player,inimigo) =>{
     if(dist < 50){
         musicaMinigame.pause()
         musicaMinigame.loop = false
-        musicaFundo.play()
         const pegou = renderizarCena("perdeuminigame")
   } 
   else{
@@ -899,7 +905,6 @@ const ColetaDeBroches = (estado,estadosBroches, ElementosBroches) =>{
   if(estadosBroches.length === 0){
     musicaMinigame.pause()
     musicaMinigame.loop = false
-    musicaFundo.play()
     clearTimeout(InimigoOficial.timeout)
     clearTimeout(inim2.timeout)
     renderizarCena("ganhouminigame")
@@ -1042,9 +1047,6 @@ const mover = (estado, tecla) => {
 
     // Se houver colisão, retorna estado atual
     if(filtro.length > 0){
-      musicaLabirinto.pause()
-      musicaLabirinto.loop = false
-      gameoverlabirinto.play()
       return renderizarCena("perdeulabirinto")
        // teste de colisão, usando um map para aplicar a função colisão que ainda vai ser definida,
     // usando um map para aplicar a função para todos, retornando arrays de true e false, o filtro
@@ -1082,7 +1084,6 @@ const MoverPersonagem = (player,estado) => {
         // se o broche pode ser coletado
         musicaLabirinto.pause()
         musicaLabirinto.loop = false
-        musicaFundo.play()
         const destino = renderizarCena('ganhoulabirinto')
         return
       }
