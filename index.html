@@ -797,20 +797,18 @@ const MoverPersonagem = (estado,broches,EntBroches) => {
       // aplica a função impura que mexe no DOM 
       // e pinta o bloco na nova posição no CSS
       if(ColetaDeBroches(novo,broches,EntBroches) === true){
-        
         MoverPersonagem(novo,broches.slice(1),EntBroches.slice(1))
       }
       // implementação recursiva que chama a função Coleta de Broches
       // caso o personagem toque o broche, aplica a função para a proxima
       // posição do array.
       else{
-        document.removeEventListener('keydown', (e))
         MoverPersonagem(novo,broches,EntBroches)
         // caso não, mantém o broche atual!
       }
   }, {once:true}) // aplicação do AddEventListener que apaga o listener após o evento ser ativado
-  // porém, por estar em um processo recursivo, o Listener retorna, isso impede que entre em um processo 
-  // de recursão infinita e trave o navegador!
+  // porém, por estar em um processo recursivo, o Listener retorna, isso impede que ele acumule os listeners
+// e trave o navegador!
 }
 // função que movimenta o primeiro inimigo!
 const moverInimigo = (player,inimigo) =>{
@@ -1123,4 +1121,5 @@ musicaLabirinto.loop = true
 }
 </script>
 </html>
+
 
